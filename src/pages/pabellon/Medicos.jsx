@@ -37,6 +37,7 @@ export default function Medicos() {
     apellido: '',
     rut: '',
     email: '',
+    telefono: '',
     especialidad: '',
     estado: 'activo',
     acceso_web_enabled: false,
@@ -236,9 +237,9 @@ export default function Medicos() {
     }
     
     if (name === 'password' && formData.acceso_web_enabled && value) {
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9@$!%*?&]{6}$/
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9@$!%*?&]{8,128}$/
       if (!passwordRegex.test(value)) {
-        errors.password = 'La contraseña debe tener exactamente 6 caracteres, al menos una letra y un número (puede incluir @)'
+        errors.password = 'La contraseña debe tener entre 8 y 128 caracteres, con al menos una letra y un número.'
       } else {
         delete errors.password
       }
@@ -559,9 +560,9 @@ export default function Medicos() {
 
       // En edición o creación: si hay contraseña, validarla
       if (formData.password) {
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9@$!%*?&]{6}$/
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9@$!%*?&]{8,128}$/
         if (!passwordRegex.test(formData.password)) {
-          showError('La contraseña debe tener exactamente 6 caracteres, al menos una letra y un número (puede incluir @)')
+          showError('La contraseña debe tener entre 8 y 128 caracteres, con al menos una letra y un número.')
           return
         }
       }
@@ -604,20 +605,12 @@ export default function Medicos() {
     return primeraLetraNombre + apellidoCompleto
   }
 
-  // Generar contraseña aleatoria: 6 caracteres, solo letras y números
+  // Generar contraseña segura usando CSPRNG (crypto.getRandomValues)
   const generarPassword = () => {
-    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    const numeros = '0123456789'
-    let password = ''
-    // Asegurar al menos una letra y un número
-    password += letras.charAt(Math.floor(Math.random() * letras.length))
-    password += numeros.charAt(Math.floor(Math.random() * numeros.length))
-    const todos = letras + numeros
-    for (let i = 2; i < 6; i++) {
-      password += todos.charAt(Math.floor(Math.random() * todos.length))
-    }
-    // Mezclar para que no siempre sea letra+numero al inicio
-    return password.split('').sort(() => Math.random() - 0.5).join('')
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const bytes = new Uint8Array(12)
+    crypto.getRandomValues(bytes)
+    return Array.from(bytes, b => chars[b % chars.length]).join('')
   }
 
   // Actualizar username cuando cambia el nombre o apellido (solo si acceso web está habilitado)
@@ -640,6 +633,7 @@ export default function Medicos() {
       apellido: medico.apellido,
       rut: rutFormateado,
       email: (medico.email || '').toLowerCase(),
+      telefono: medico.telefono || '',
       especialidad: medico.especialidad,
       estado: medico.estado,
       acceso_web_enabled: medico.acceso_web_enabled,
@@ -832,6 +826,18 @@ export default function Medicos() {
               </div>
             </div>
 
+            <div>
+              <label className="label-field">Teléfono WhatsApp</label>
+              <input
+                type="tel"
+                value={formData.telefono}
+                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^+\d\s]/g, '') })}
+                className="input-field"
+                placeholder="+56912345678"
+              />
+              <p className="text-xs text-slate-400 mt-1">Formato internacional, ej: +56912345678</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label-field">Especialidad *</label>
@@ -947,7 +953,7 @@ export default function Medicos() {
                     </div>
                     {formData.password && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Contraseña generada. El usuario podrá cambiarla al primer inicio de sesión.
+                        Mínimo 8 caracteres, al menos una letra y un número.
                       </p>
                     )}
                   </div>

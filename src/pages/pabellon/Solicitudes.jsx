@@ -74,8 +74,8 @@ export default function Solicitudes() {
         .from('surgery_requests')
         .select(`
           *,
-          doctors:doctor_id(id, user_id, nombre, apellido, especialidad, estado),
-          patients:patient_id(nombre, apellido, rut),
+          doctors:doctor_id(id, user_id, nombre, apellido, especialidad, estado, telefono),
+          patients:patient_id(nombre, apellido, rut, telefono),
           surgery_request_supplies(
             cantidad,
             supplies:supply_id(nombre, codigo, grupo_prestacion)
@@ -156,19 +156,46 @@ export default function Solicitudes() {
     })
   }, [solicitudes, filtroEstado, filtroDoctor, filtroCodigoOperacion, debouncedBusqueda])
 
+  const enviarWhatsApp = async (solicitud, tipo) => {
+    const nombreDoctor   = solicitud.doctors ? `${solicitud.doctors.nombre} ${solicitud.doctors.apellido}` : null
+    const nombrePaciente = solicitud.patients ? `${solicitud.patients.nombre} ${solicitud.patients.apellido}` : null
+    const fechaCirugia   = solicitud.hora_recomendada
+      ? format(new Date(solicitud.hora_recomendada), "dd/MM/yyyy HH:mm")
+      : solicitud.fecha_preferida || null
+    const observaciones  = solicitud.observaciones || null
+
+    const payload = { tipo, nombreDoctor, nombrePaciente, fechaCirugia, observaciones }
+
+    // Notificar al médico
+    if (solicitud.doctors?.telefono) {
+      supabase.functions.invoke('send-whatsapp', {
+        body: { ...payload, to: solicitud.doctors.telefono, destinatario: 'doctor' },
+      }).catch(() => {})
+    }
+
+    // Notificar al paciente
+    if (solicitud.patients?.telefono) {
+      supabase.functions.invoke('send-whatsapp', {
+        body: { ...payload, to: solicitud.patients.telefono, destinatario: 'paciente' },
+      }).catch(() => {})
+    }
+  }
+
   const aceptarSolicitud = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (solicitud) => {
       const { error } = await supabase
         .from('surgery_requests')
         .update({ estado: 'aceptada', updated_at: new Date().toISOString() })
-        .eq('id', id)
-      
+        .eq('id', solicitud.id)
+
       if (error) throw error
+      return solicitud
     },
-    onSuccess: () => {
+    onSuccess: (solicitud) => {
       queryClient.invalidateQueries(['solicitudes'])
       queryClient.invalidateQueries(['solicitudes-pendientes'])
       showSuccess('Solicitud aceptada exitosamente')
+      enviarWhatsApp(solicitud, 'aceptada')
     },
     onError: (error) => {
       const errorMessage = error.message || error.toString() || 'Error desconocido'
@@ -184,19 +211,21 @@ export default function Solicitudes() {
   const [solicitudARechazar, setSolicitudARechazar] = useState(null)
 
   const rechazarSolicitud = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async (solicitud) => {
       const { error } = await supabase
         .from('surgery_requests')
         .update({ estado: 'rechazada', updated_at: new Date().toISOString() })
-        .eq('id', id)
-      
+        .eq('id', solicitud.id)
+
       if (error) throw error
+      return solicitud
     },
-    onSuccess: () => {
+    onSuccess: (solicitud) => {
       queryClient.invalidateQueries(['solicitudes'])
       showSuccess('Solicitud rechazada')
       setShowConfirmRechazar(false)
       setSolicitudARechazar(null)
+      enviarWhatsApp(solicitud, 'rechazada')
     },
     onError: (error) => {
       const errorMessage = error.message || error.toString() || 'Error desconocido'
@@ -215,7 +244,7 @@ export default function Solicitudes() {
 
   const confirmarRechazar = () => {
     if (solicitudARechazar) {
-      rechazarSolicitud.mutate(solicitudARechazar.id)
+      rechazarSolicitud.mutate(solicitudARechazar)
     }
   }
 
@@ -355,11 +384,14 @@ export default function Solicitudes() {
 
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries(['solicitudes'])
       queryClient.invalidateQueries(['solicitudes-pendientes'])
       queryClient.invalidateQueries(['cirugias-hoy'])
       queryClient.invalidateQueries(['cirugias-calendario'])
+      if (solicitudProgramando) {
+        enviarWhatsApp({ ...solicitudProgramando, hora_recomendada: variables.formData?.fecha ? `${variables.formData.fecha}T${variables.formData.hora_inicio}` : solicitudProgramando.hora_recomendada }, 'aceptada')
+      }
       setSolicitudProgramando(null)
       setFormProgramacion({
         fecha: '',
@@ -445,11 +477,12 @@ export default function Solicitudes() {
 
       return data
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries(['solicitudes'])
       queryClient.invalidateQueries(['solicitudes-pendientes'])
       queryClient.invalidateQueries(['cirugias-hoy'])
       queryClient.invalidateQueries(['cirugias-calendario'])
+      if (variables.solicitud) enviarWhatsApp(variables.solicitud, 'aceptada')
       setSolicitudAceptandoHorario(null)
       showSuccess('Horario del médico aceptado y cirugía programada')
     },
@@ -606,6 +639,7 @@ export default function Solicitudes() {
     }
 
     programarConHorarioDelMedico.mutate({
+      solicitud,
       solicitudId: solicitud.id,
       fecha: horario.fecha,
       operatingRoomId: horario.operatingRoomId,

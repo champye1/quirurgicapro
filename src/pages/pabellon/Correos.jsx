@@ -6,7 +6,8 @@ import { es } from 'date-fns/locale'
 import {
   Mail, MailOpen, Archive, Trash2, Clock, AlertTriangle,
   Search, User, Phone, Building2, ChevronDown, ChevronUp,
-  StickyNote, Link2, CheckCircle2
+  StickyNote, Link2, CheckCircle2, Settings, Eye, EyeOff,
+  RefreshCw, CheckCircle, XCircle, MessageSquare
 } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -26,13 +27,20 @@ export default function Correos() {
   const { showSuccess, showError } = useNotifications()
   const queryClient = useQueryClient()
 
-  const [filtro, setFiltro] = useState('no_leidos') // no_leidos | todos | archivados
+  const [filtro, setFiltro] = useState('no_leidos')
   const [busqueda, setBusqueda] = useState('')
   const [mensajeAbierto, setMensajeAbierto] = useState(null)
   const [notasEditando, setNotasEditando] = useState('')
   const [guardandoNotas, setGuardandoNotas] = useState(false)
   const [expandedId, setExpandedId] = useState(null)
   const [showLinkModal, setShowLinkModal] = useState(false)
+  const [showGmailConfig, setShowGmailConfig] = useState(false)
+  const [gmailForm, setGmailForm] = useState({ email: '', client_id: '', client_secret: '', refresh_token: '' })
+  const [showSecrets, setShowSecrets] = useState({ client_id: false, client_secret: false, refresh_token: false })
+  const [pollingManual, setPollingManual] = useState(false)
+  const [showWspConfig, setShowWspConfig] = useState(false)
+  const [wspForm, setWspForm] = useState({ phone_number_id: '', access_token: '' })
+  const [showWspSecrets, setShowWspSecrets] = useState({ phone_number_id: false, access_token: false })
 
   // ──────────────── QUERY ────────────────
   const { data: mensajes = [], isLoading } = useQuery({
@@ -77,7 +85,110 @@ export default function Correos() {
     refetchInterval: 30000,
   })
 
-  // Búsqueda local
+  // ──────────────── GMAIL CONFIG ────────────────
+  const { data: gmailConfig } = useQuery({
+    queryKey: ['gmail-config'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('clinic_settings')
+        .select('value')
+        .eq('key', 'gmail_config')
+        .maybeSingle()
+      return data?.value || null
+    },
+  })
+
+  // Abrir modal con datos existentes
+  const handleOpenGmailConfig = () => {
+    setGmailForm({
+      email:         gmailConfig?.email         || '',
+      client_id:     gmailConfig?.client_id     || '',
+      client_secret: gmailConfig?.client_secret || '',
+      refresh_token: gmailConfig?.refresh_token || '',
+    })
+    setShowGmailConfig(true)
+  }
+
+  const guardarGmailConfig = useMutation({
+    mutationFn: async (form) => {
+      const { error } = await supabase
+        .from('clinic_settings')
+        .upsert({ key: 'gmail_config', value: form, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['gmail-config'])
+      setShowGmailConfig(false)
+      showSuccess('Configuración de Gmail guardada correctamente.')
+    },
+    onError: () => showError('Error al guardar la configuración de Gmail.'),
+  })
+
+  // ──────────────── WHATSAPP CONFIG ────────────────
+  const { data: wspConfig } = useQuery({
+    queryKey: ['whatsapp-config'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('clinic_settings')
+        .select('value')
+        .eq('key', 'whatsapp_config')
+        .maybeSingle()
+      return data?.value || null
+    },
+  })
+
+  const handleOpenWspConfig = () => {
+    setWspForm({
+      phone_number_id: wspConfig?.phone_number_id || '',
+      access_token:    wspConfig?.access_token    || '',
+    })
+    setShowWspConfig(true)
+  }
+
+  const guardarWspConfig = useMutation({
+    mutationFn: async (form) => {
+      const { error } = await supabase
+        .from('clinic_settings')
+        .upsert({ key: 'whatsapp_config', value: form, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['whatsapp-config'])
+      setShowWspConfig(false)
+      showSuccess('Configuración de WhatsApp guardada correctamente.')
+    },
+    onError: () => showError('Error al guardar la configuración de WhatsApp.'),
+  })
+
+  const ejecutarPollManual = async () => {
+    setPollingManual(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const { data, error } = await supabase.functions.invoke('poll-gmail', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (error) throw error
+      if (data?.inserted > 0) {
+        showSuccess(`Se importaron ${data.inserted} mensaje(s) nuevo(s).`)
+        queryClient.invalidateQueries(['external-messages'])
+        queryClient.invalidateQueries(['external-messages-count'])
+      } else {
+        console.log('poll-gmail response:', data)
+        showSuccess('No hay mensajes nuevos en Gmail.')
+      }
+    } catch (e) {
+      console.error('poll-gmail error completo:', e, JSON.stringify(e, Object.getOwnPropertyNames(e)))
+      // Intentar extraer el body del error
+      if (e?.context) {
+        try { const body = await e.context.json(); console.error('error body:', body) } catch {}
+      }
+      showError('Error al consultar Gmail: ' + (e?.message || 'Error desconocido'))
+    } finally {
+      setPollingManual(false)
+    }
+  }
+
+  // ──────────────── BÚSQUEDA LOCAL ────────────────
   const mensajesFiltrados = useMemo(() => {
     if (!busqueda.trim()) return mensajes
     const b = busqueda.toLowerCase()
@@ -184,17 +295,54 @@ export default function Correos() {
             Mensajes de médicos externos
           </p>
         </div>
-        <button
-          onClick={() => setShowLinkModal(true)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
-            isDark
-              ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
-              : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Link2 className="w-4 h-4" />
-          Ver enlace de contacto
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={ejecutarPollManual}
+            disabled={pollingManual}
+            title="Revisar Gmail ahora"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all disabled:opacity-50 ${
+              isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <RefreshCw className={`w-4 h-4 ${pollingManual ? 'animate-spin' : ''}`} />
+            {pollingManual ? 'Revisando...' : 'Revisar Gmail'}
+          </button>
+          <button
+            onClick={handleOpenGmailConfig}
+            title="Configurar Gmail"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+              isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+            {gmailConfig?.email
+              ? <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-green-500" />{gmailConfig.email}</span>
+              : <span className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-400" />Configurar Gmail</span>
+            }
+          </button>
+          <button
+            onClick={handleOpenWspConfig}
+            title="Configurar WhatsApp"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+              isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            {wspConfig?.phone_number_id
+              ? <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-green-500" />WhatsApp</span>
+              : <span className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-400" />WhatsApp</span>
+            }
+          </button>
+          <button
+            onClick={() => setShowLinkModal(true)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+              isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Link2 className="w-4 h-4" />
+            Enlace contacto
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -453,6 +601,206 @@ export default function Correos() {
           })}
         </div>
       )}
+
+      {/* Modal: configuración Gmail */}
+      <Modal
+        isOpen={showGmailConfig}
+        onClose={() => setShowGmailConfig(false)}
+        title="Configurar integración Gmail"
+      >
+        <div className="space-y-4">
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Ingresa las credenciales de la cuenta de Gmail que recibirá los correos de médicos externos.
+            Necesitas un proyecto en Google Cloud con la API de Gmail habilitada.
+          </p>
+
+          {/* Email */}
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Correo Gmail
+            </label>
+            <input
+              type="email"
+              value={gmailForm.email}
+              onChange={e => setGmailForm(f => ({ ...f, email: e.target.value }))}
+              placeholder="pabellon@gmail.com"
+              className={`w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+              }`}
+            />
+          </div>
+
+          {/* Client ID */}
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Client ID
+            </label>
+            <div className="relative">
+              <input
+                type={showSecrets.client_id ? 'text' : 'password'}
+                value={gmailForm.client_id}
+                onChange={e => setGmailForm(f => ({ ...f, client_id: e.target.value }))}
+                placeholder="xxxxxxxxxx.apps.googleusercontent.com"
+                className={`w-full px-3 py-2 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+                }`}
+              />
+              <button type="button" onClick={() => setShowSecrets(s => ({ ...s, client_id: !s.client_id }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showSecrets.client_id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Client Secret */}
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Client Secret
+            </label>
+            <div className="relative">
+              <input
+                type={showSecrets.client_secret ? 'text' : 'password'}
+                value={gmailForm.client_secret}
+                onChange={e => setGmailForm(f => ({ ...f, client_secret: e.target.value }))}
+                placeholder="GOCSPX-xxxxxxxxxxxx"
+                className={`w-full px-3 py-2 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+                }`}
+              />
+              <button type="button" onClick={() => setShowSecrets(s => ({ ...s, client_secret: !s.client_secret }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showSecrets.client_secret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Refresh Token */}
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Refresh Token
+            </label>
+            <div className="relative">
+              <input
+                type={showSecrets.refresh_token ? 'text' : 'password'}
+                value={gmailForm.refresh_token}
+                onChange={e => setGmailForm(f => ({ ...f, refresh_token: e.target.value }))}
+                placeholder="1//xxxxxxxxxxxx"
+                className={`w-full px-3 py-2 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+                }`}
+              />
+              <button type="button" onClick={() => setShowSecrets(s => ({ ...s, refresh_token: !s.refresh_token }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showSecrets.refresh_token ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className={`text-[10px] p-3 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
+            Para obtener estas credenciales: Google Cloud Console → APIs → Gmail API → Credenciales → OAuth 2.0.
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowGmailConfig(false)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={guardarGmailConfig.isPending || !gmailForm.email}
+              onClick={() => guardarGmailConfig.mutate(gmailForm)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50"
+            >
+              {guardarGmailConfig.isPending ? 'Guardando...' : 'Guardar configuración'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal: configuración WhatsApp */}
+      <Modal
+        isOpen={showWspConfig}
+        onClose={() => setShowWspConfig(false)}
+        title="Configurar WhatsApp Business"
+      >
+        <div className="space-y-4">
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Ingresa las credenciales de tu app de Meta para enviar notificaciones por WhatsApp.
+            Necesitas una cuenta en Meta for Developers con el producto WhatsApp habilitado.
+          </p>
+
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Phone Number ID
+            </label>
+            <div className="relative">
+              <input
+                type={showWspSecrets.phone_number_id ? 'text' : 'password'}
+                value={wspForm.phone_number_id}
+                onChange={e => setWspForm(f => ({ ...f, phone_number_id: e.target.value }))}
+                placeholder="123456789012345"
+                className={`w-full px-3 py-2 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+                }`}
+              />
+              <button type="button" onClick={() => setShowWspSecrets(s => ({ ...s, phone_number_id: !s.phone_number_id }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showWspSecrets.phone_number_id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Access Token
+            </label>
+            <div className="relative">
+              <input
+                type={showWspSecrets.access_token ? 'text' : 'password'}
+                value={wspForm.access_token}
+                onChange={e => setWspForm(f => ({ ...f, access_token: e.target.value }))}
+                placeholder="EAAxxxxxxxxxxxxxxxx"
+                className={`w-full px-3 py-2 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-700 placeholder-slate-400'
+                }`}
+              />
+              <button type="button" onClick={() => setShowWspSecrets(s => ({ ...s, access_token: !s.access_token }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showWspSecrets.access_token ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className={`text-[10px] p-3 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-green-50 border-green-100 text-green-700'}`}>
+            Meta for Developers → Tu App → WhatsApp → API Setup → Phone Number ID y Access Token.
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowWspConfig(false)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={guardarWspConfig.isPending || !wspForm.phone_number_id || !wspForm.access_token}
+              onClick={() => guardarWspConfig.mutate(wspForm)}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50"
+            >
+              {guardarWspConfig.isPending ? 'Guardando...' : 'Guardar configuración'}
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Modal: enlace de contacto */}
       <Modal

@@ -47,7 +47,7 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
 
 /** Obtiene los IDs de mensajes no leídos en el inbox */
 async function getUnreadMessageIds(accessToken: string): Promise<string[]> {
-  const url = `${GMAIL_API_BASE}/messages?q=is:unread in:inbox&maxResults=20`
+  const url = `${GMAIL_API_BASE}/messages?q=is:unread&maxResults=20`
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
@@ -166,7 +166,9 @@ async function parseMessage(accessToken: string, messageId: string): Promise<Par
 
   // Extraer email del campo From (puede ser "Nombre <email>" o solo "email")
   const emailMatch = fromRaw.match(/<([^>]+)>/)
-  const fromEmail = emailMatch ? emailMatch[1] : fromRaw.trim()
+  const rawEmail  = emailMatch ? emailMatch[1] : fromRaw.trim()
+  // Validar formato para prevenir header/mailto injection
+  const fromEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail) ? rawEmail : ''
   const fromName  = emailMatch ? fromRaw.replace(/<[^>]+>/, '').trim().replace(/^"|"$/g, '') : fromEmail
 
   const body = extractBody(msg.payload as GmailPayload)
@@ -209,17 +211,9 @@ serve(async (req) => {
     // Variables de entorno
     const supabaseUrl        = Deno.env.get('SUPABASE_URL') || ''
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    const gmailClientId      = Deno.env.get('GMAIL_CLIENT_ID') || ''
-    const gmailClientSecret  = Deno.env.get('GMAIL_CLIENT_SECRET') || ''
-    const gmailRefreshToken  = Deno.env.get('GMAIL_REFRESH_TOKEN') || ''
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(JSON.stringify({ error: 'Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-    if (!gmailClientId || !gmailClientSecret || !gmailRefreshToken) {
-      return new Response(JSON.stringify({ error: 'Faltan variables GMAIL_*. Ver instrucciones en database/migrations/SETUP_GMAIL.md' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
@@ -228,14 +222,33 @@ serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    // 1. Obtener access token
+    // 1. Leer credenciales: primero desde clinic_settings (BD), luego desde secrets
+    const { data: settingsRow } = await supabase
+      .from('clinic_settings')
+      .select('value')
+      .eq('key', 'gmail_config')
+      .maybeSingle()
+
+    const cfg = settingsRow?.value || {}
+    const gmailClientId     = cfg.client_id     || Deno.env.get('GMAIL_CLIENT_ID')     || ''
+    const gmailClientSecret = cfg.client_secret || Deno.env.get('GMAIL_CLIENT_SECRET') || ''
+    const gmailRefreshToken = cfg.refresh_token || Deno.env.get('GMAIL_REFRESH_TOKEN') || ''
+
+    if (!gmailClientId || !gmailClientSecret || !gmailRefreshToken) {
+      return new Response(JSON.stringify({
+        error: 'Gmail no configurado. Ve a Bandeja de Correos → Configurar Gmail e ingresa las credenciales.',
+      }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
+    // 2. Obtener access token
     const accessToken = await getAccessToken(gmailClientId, gmailClientSecret, gmailRefreshToken)
 
     // 2. Obtener IDs de mensajes no leídos
+    // 3. Obtener IDs de mensajes no leídos
     const messageIds = await getUnreadMessageIds(accessToken)
 
     if (messageIds.length === 0) {
-      return new Response(JSON.stringify({ success: true, inserted: 0, message: 'No hay mensajes nuevos' }), {
+      return new Response(JSON.stringify({ success: true, inserted: 0, message: 'No hay mensajes no leídos en Gmail', debug: { credentialsSource: settingsRow ? 'db' : 'env', hasClientId: !!gmailClientId, hasRefreshToken: !!gmailRefreshToken } }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

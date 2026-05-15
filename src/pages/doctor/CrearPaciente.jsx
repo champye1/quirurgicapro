@@ -21,6 +21,7 @@ export default function CrearPaciente() {
     nombre: '',
     apellido: '',
     rut: '',
+    telefono: '',
     codigo_operacion: '',
     hora_recomendada: '',
     hora_fin_recomendada: '',
@@ -217,13 +218,14 @@ export default function CrearPaciente() {
         // Usar el paciente existente
         paciente = pacienteExistente
         
-        // Actualizar nombre/apellido si han cambiado
-        if (pacienteExistente.nombre !== data.nombre || pacienteExistente.apellido !== data.apellido) {
+        // Actualizar nombre/apellido/telefono si han cambiado
+        if (pacienteExistente.nombre !== data.nombre || pacienteExistente.apellido !== data.apellido || data.telefono) {
           const { error: updateError } = await supabase
             .from('patients')
-            .update({ 
-              nombre: data.nombre, 
+            .update({
+              nombre: data.nombre,
               apellido: data.apellido,
+              ...(data.telefono ? { telefono: data.telefono } : {}),
               updated_at: new Date().toISOString()
             })
             .eq('id', pacienteExistente.id)
@@ -246,6 +248,7 @@ export default function CrearPaciente() {
             nombre: data.nombre,
             apellido: data.apellido,
             rut: cleanRut(data.rut),
+            ...(data.telefono ? { telefono: data.telefono } : {}),
           })
           .select()
           .single()
@@ -571,6 +574,17 @@ export default function CrearPaciente() {
                   required
                 />
               </div>
+            </div>
+            <div className="mt-4">
+              <label className="label-field">Teléfono WhatsApp del paciente</label>
+              <input
+                type="tel"
+                value={formData.telefono}
+                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^+\d\s]/g, '') })}
+                className="input-field"
+                placeholder="+56912345678"
+              />
+              <p className="text-xs text-slate-400 mt-1">Para notificar al paciente cuando se confirme su hora</p>
             </div>
             <div className="mt-4">
               <label className="label-field">RUT *</label>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { Mail, Lock, AlertCircle, Building2, ArrowLeft, Stethoscope } from 'lucide-react'
+import { Mail, Lock, AlertCircle, Building2, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { sanitizeEmail, sanitizePassword } from '../../utils/sanitizeInput'
 import { 
   isLocked, 
@@ -16,6 +16,7 @@ export default function LoginPabellon() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [lockoutInfo, setLockoutInfo] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
   // Verificar bloqueo al cambiar el email
@@ -186,14 +187,22 @@ export default function LoginPabellon() {
               <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(sanitizePassword(e.target.value))}
-                className="w-full bg-slate-50 border-2 border-slate-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-10 sm:pl-12 pr-3 sm:pr-4 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-sm sm:text-base text-slate-700 touch-manipulation"
+                className="w-full bg-slate-50 border-2 border-slate-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-10 sm:pl-12 pr-12 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-sm sm:text-base text-slate-700 touch-manipulation"
                 placeholder="••••••••"
                 required
                 disabled={loading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
+              </button>
             </div>
           </div>
 

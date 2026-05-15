@@ -224,7 +224,6 @@ export function sanitizePassword(input) {
   if (input == null || typeof input !== 'string') {
     return ''
   }
-  // Quitar caracteres de control (incl. null byte) que pueden causar bypass
-  const withoutControl = input.replace(CONTROL_CHARS_REGEX, '')
-  return sanitizeString(withoutControl, { allowHTML: true, trim: false })
+  // Solo eliminar caracteres de control y null bytes — nunca mutar el contenido de la contraseña
+  return input.replace(CONTROL_CHARS_REGEX, '')
 }
