@@ -4,6 +4,8 @@ import { supabase } from './config/supabase'
 import { logger } from './utils/logger'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
+const LandingPage       = lazy(() => import('./pages/public/LandingPage'))
+const PoliticaPrivacidad = lazy(() => import('./pages/public/PoliticaPrivacidad'))
 const Inicio            = lazy(() => import('./pages/auth/Inicio'))
 const LoginPabellon     = lazy(() => import('./pages/auth/LoginPabellon'))
 const LoginDoctor       = lazy(() => import('./pages/auth/LoginDoctor'))
@@ -148,10 +150,23 @@ function AppContent() {
           user && userRole ? (
             <Navigate to={userRole === 'pabellon' ? '/pabellon' : '/doctor'} replace />
           ) : (
+            <LandingPage />
+          )
+        }
+      />
+
+      <Route
+        path="/acceso"
+        element={
+          user && userRole ? (
+            <Navigate to={userRole === 'pabellon' ? '/pabellon' : '/doctor'} replace />
+          ) : (
             <Inicio />
           )
-        } 
+        }
       />
+
+      <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
       
       <Route 
         path="/login/pabellon" 
