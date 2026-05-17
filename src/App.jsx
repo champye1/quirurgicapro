@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { supabase } from './config/supabase'
 import { logger } from './utils/logger'
-import Inicio from './pages/auth/Inicio'
-import LoginPabellon from './pages/auth/LoginPabellon'
-import LoginDoctor from './pages/auth/LoginDoctor'
-import RecuperarContraseña from './pages/auth/RecuperarContraseña'
-import RestablecerContraseña from './pages/auth/RestablecerContraseña'
-import ContactoExterno from './pages/public/ContactoExterno'
-import PabellonLayout from './layouts/PabellonLayout'
-import DoctorLayout from './layouts/DoctorLayout'
 import LoadingSpinner from './components/common/LoadingSpinner'
+
+const Inicio            = lazy(() => import('./pages/auth/Inicio'))
+const LoginPabellon     = lazy(() => import('./pages/auth/LoginPabellon'))
+const LoginDoctor       = lazy(() => import('./pages/auth/LoginDoctor'))
+const RecuperarContraseña   = lazy(() => import('./pages/auth/RecuperarContraseña'))
+const RestablecerContraseña = lazy(() => import('./pages/auth/RestablecerContraseña'))
+const ContactoExterno   = lazy(() => import('./pages/public/ContactoExterno'))
+const PabellonLayout    = lazy(() => import('./layouts/PabellonLayout'))
+const DoctorLayout      = lazy(() => import('./layouts/DoctorLayout'))
 
 // Detecta si el error es por token de refresco inválido (sesión antigua/revocada)
 function isInvalidRefreshTokenError(error) {
@@ -139,9 +140,10 @@ function AppContent() {
   }
 
   return (
+    <Suspense fallback={<LoadingSpinner />}>
     <Routes>
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           user && userRole ? (
             <Navigate to={userRole === 'pabellon' ? '/pabellon' : '/doctor'} replace />
@@ -222,6 +224,7 @@ function AppContent() {
         } 
       />
     </Routes>
+    </Suspense>
   )
 }
 

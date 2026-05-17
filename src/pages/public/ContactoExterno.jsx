@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { supabase } from '../../config/supabase'
 import { Stethoscope, Send, CheckCircle2, AlertCircle } from 'lucide-react'
-import { sanitizeString } from '../../utils/sanitizeInput'
+import { sanitizeString, sanitizeRut } from '../../utils/sanitizeInput'
+import { isValidRutFormat, validateRut } from '../../utils/rutFormatter'
 
 const ESPECIALIDADES = [
   'Cirugía General',
@@ -37,7 +38,11 @@ export default function ContactoExterno() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: sanitizeString(value) }))
+    if (name === 'rut_paciente') {
+      setForm(prev => ({ ...prev, [name]: sanitizeRut(value) }))
+    } else {
+      setForm(prev => ({ ...prev, [name]: sanitizeString(value) }))
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -49,10 +54,30 @@ export default function ContactoExterno() {
       return
     }
 
+    if (form.nombre_remitente.trim().length < 2) {
+      setError('El nombre debe tener al menos 2 caracteres.')
+      return
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email_remitente)) {
       setError('Por favor ingrese un correo electrónico válido.')
       return
+    }
+
+    if (form.telefono_remitente.trim()) {
+      const telLimpio = form.telefono_remitente.replace(/\s/g, '')
+      if (!/^\+?[1-9]\d{7,14}$/.test(telLimpio)) {
+        setError('El teléfono debe estar en formato internacional: +56912345678')
+        return
+      }
+    }
+
+    if (form.rut_paciente.trim()) {
+      if (!isValidRutFormat(form.rut_paciente) || !validateRut(form.rut_paciente)) {
+        setError('El RUT del paciente no es válido. Use el formato: 12.345.678-9')
+        return
+      }
     }
 
     setEnviando(true)

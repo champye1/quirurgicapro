@@ -793,6 +793,7 @@ export default function Solicitudes() {
             value={busqueda}
             onChange={(e) => setBusqueda(sanitizeString(e.target.value))}
             placeholder="Buscar por paciente, RUT, doctor o código..."
+            aria-label="Buscar solicitudes"
             className={`w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 border-2 rounded-xl sm:rounded-2xl focus:border-blue-500 focus:outline-none font-bold text-sm sm:text-base transition-all touch-manipulation ${
               theme === 'dark'
                 ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-400'
@@ -1007,8 +1008,9 @@ export default function Solicitudes() {
                           : 'text-blue-600 hover:bg-blue-50 border-blue-100 hover:border-blue-300'
                       }`}
                       title="Ver detalles"
+                      aria-label="Ver detalles de la solicitud"
                     >
-                      <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Eye className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                     </button>
                     
                     {/* Botón Reagendar: cuando el doctor pidió reagendamiento y la solicitud ya está aceptada/programada */}
@@ -1083,8 +1085,12 @@ export default function Solicitudes() {
 
       {/* Modal de Detalles */}
       {solicitudDetalle && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-[2rem] p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar ${
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="presentation">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Detalles de la Solicitud"
+            className={`rounded-[2rem] p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar ${
             theme === 'dark'
               ? 'bg-slate-800'
               : theme === 'medical'
@@ -1102,10 +1108,11 @@ export default function Solicitudes() {
                     ? 'hover:bg-slate-700'
                     : 'hover:bg-slate-100'
                 }`}
+                aria-label="Cerrar detalles"
               >
                 <X className={`w-5 h-5 ${
                   theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
-                }`} />
+                }`} aria-hidden="true" />
               </button>
             </div>
 
@@ -1317,8 +1324,13 @@ export default function Solicitudes() {
 
       {/* Modal de Programación - Estilo Gemini */}
       {solicitudProgramando && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-6xl overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[95vh]">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300" role="presentation">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Programar Cirugía"
+            className="bg-white rounded-[2.5rem] w-full max-w-6xl overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[95vh]"
+          >
             <div className="p-8 bg-slate-900 text-white flex justify-between items-center flex-shrink-0">
               <div>
                 <h2 className="text-2xl font-black uppercase tracking-tighter">Programar Cirugía</h2>
@@ -1341,8 +1353,9 @@ export default function Solicitudes() {
                   sessionStorage.removeItem('slot_seleccionado')
                 }}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Cerrar programación"
               >
-                <X size={24} className="text-white" />
+                <X size={24} className="text-white" aria-hidden="true" />
               </button>
             </div>
 

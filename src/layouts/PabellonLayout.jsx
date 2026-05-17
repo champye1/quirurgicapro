@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { supabase } from '../config/supabase'
-import { 
+import {
   LayoutDashboard,
   FileText,
   Calendar,
@@ -26,14 +26,16 @@ import {
   Mail
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import Dashboard from '../pages/pabellon/Dashboard'
-import Solicitudes from '../pages/pabellon/Solicitudes'
-import Calendario from '../pages/pabellon/Calendario'
-import BloqueoHorario from '../pages/pabellon/BloqueoHorario'
-import Medicos from '../pages/pabellon/Medicos'
-import Insumos from '../pages/pabellon/Insumos'
-import Auditoria from '../pages/pabellon/Auditoria'
-import Correos from '../pages/pabellon/Correos'
+import LoadingSpinner from '../components/common/LoadingSpinner'
+
+const Dashboard    = lazy(() => import('../pages/pabellon/Dashboard'))
+const Solicitudes  = lazy(() => import('../pages/pabellon/Solicitudes'))
+const Calendario   = lazy(() => import('../pages/pabellon/Calendario'))
+const BloqueoHorario = lazy(() => import('../pages/pabellon/BloqueoHorario'))
+const Medicos      = lazy(() => import('../pages/pabellon/Medicos'))
+const Insumos      = lazy(() => import('../pages/pabellon/Insumos'))
+const Auditoria    = lazy(() => import('../pages/pabellon/Auditoria'))
+const Correos      = lazy(() => import('../pages/pabellon/Correos'))
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications'
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications'
 import { useNotificationsList } from '../hooks/useNotificationsList'
@@ -445,17 +447,19 @@ export default function PabellonLayout() {
         <main className={`flex-1 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10 transition-colors duration-150 min-h-full ${
           theme === 'dark' ? 'bg-slate-900' : theme === 'medical' ? 'bg-slate-50' : 'bg-slate-50'
         }`}>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/solicitudes" element={<Solicitudes />} />
-            <Route path="/calendario" element={<Calendario />} />
-            <Route path="/bloqueo" element={<BloqueoHorario />} />
-            <Route path="/medicos" element={<Medicos />} />
-            <Route path="/insumos" element={<Insumos />} />
-            <Route path="/correos" element={<Correos />} />
-            <Route path="/auditoria" element={<Auditoria />} />
-            <Route path="*" element={<Navigate to="/pabellon" />} />
-          </Routes>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/solicitudes" element={<Solicitudes />} />
+              <Route path="/calendario" element={<Calendario />} />
+              <Route path="/bloqueo" element={<BloqueoHorario />} />
+              <Route path="/medicos" element={<Medicos />} />
+              <Route path="/insumos" element={<Insumos />} />
+              <Route path="/correos" element={<Correos />} />
+              <Route path="/auditoria" element={<Auditoria />} />
+              <Route path="*" element={<Navigate to="/pabellon" />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
 

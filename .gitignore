@@ -23,10 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment variables — nunca subir credenciales reales
 .env
 .env.local
 .env.production
+.env.development.local
+.env.production.local
 
 # Build outputs
 build/

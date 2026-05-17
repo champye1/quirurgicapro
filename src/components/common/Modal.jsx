@@ -2,7 +2,7 @@ import { memo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 
-function Modal({ isOpen, onClose, children, title }) {
+function Modal({ isOpen, onClose, children, title, 'aria-label': ariaLabel }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -44,7 +44,10 @@ function Modal({ isOpen, onClose, children, title }) {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-[101] flex items-center justify-center p-3 sm:p-4 md:p-6 pointer-events-none"
           >
-            <div 
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={ariaLabel || title}
               className="bg-white rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-slate-100 pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >

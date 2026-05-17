@@ -536,13 +536,40 @@ export default function Medicos() {
   const handleSubmit = (e) => {
     e.preventDefault()
     
+    // Validar nombre y apellido
+    if (formData.nombre.trim().length < 2) {
+      showError('El nombre debe tener al menos 2 caracteres')
+      return
+    }
+    if (formData.apellido.trim().length < 2) {
+      showError('El apellido debe tener al menos 2 caracteres')
+      return
+    }
+    if (!/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(formData.nombre)) {
+      showError('El nombre debe contener letras')
+      return
+    }
+    if (!/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(formData.apellido)) {
+      showError('El apellido debe contener letras')
+      return
+    }
+
+    // Validar teléfono WhatsApp si se ingresó
+    if (formData.telefono) {
+      const telefonoLimpio = formData.telefono.replace(/\s/g, '')
+      if (!/^\+[1-9]\d{7,14}$/.test(telefonoLimpio)) {
+        showError('El teléfono debe estar en formato internacional: +56912345678')
+        return
+      }
+    }
+
     // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
       showError('El formato del email no es válido')
       return
     }
-    
+
     // Validar RUT con dígito verificador
     const rutLimpio = cleanRut(formData.rut)
     if (!validateRut(rutLimpio)) {
@@ -667,16 +694,18 @@ export default function Medicos() {
                 onClick={handleExportCSV}
                 className="btn-secondary flex items-center gap-2 text-sm"
                 title="Exportar a CSV"
+                aria-label="Exportar a CSV"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">CSV</span>
               </button>
               <button
                 onClick={handleExportExcel}
                 className="btn-secondary flex items-center gap-2 text-sm"
                 title="Exportar a Excel"
+                aria-label="Exportar a Excel"
               >
-                <FileSpreadsheet className="w-4 h-4" />
+                <FileSpreadsheet className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Excel</span>
               </button>
             </>
@@ -720,6 +749,7 @@ export default function Medicos() {
               onChange={(e) => setBusqueda(sanitizeString(e.target.value))}
               placeholder="Buscar por nombre, apellido, RUT o email..."
               className="input-field pl-10"
+              aria-label="Buscar médicos"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -1054,13 +1084,14 @@ export default function Medicos() {
                         <button
                           onClick={() => iniciarEdicion(medico)}
                           className={`p-2 rounded transition-colors ${
-                            theme === 'dark' 
-                              ? 'text-blue-400 hover:bg-blue-900/30 hover:text-blue-300' 
+                            theme === 'dark'
+                              ? 'text-blue-400 hover:bg-blue-900/30 hover:text-blue-300'
                               : 'text-blue-600 hover:bg-blue-50'
                           }`}
                           title="Editar médico"
+                          aria-label="Editar médico"
                         >
-                          <Edit className="w-5 h-5" />
+                          <Edit className="w-5 h-5" aria-hidden="true" />
                         </button>
                         <button
                           onClick={() => toggleAccesoWeb.mutate({
@@ -1068,19 +1099,20 @@ export default function Medicos() {
                             acceso_web_enabled: !medico.acceso_web_enabled
                           })}
                           className={`p-2 rounded transition-colors ${
-                            theme === 'dark' 
-                              ? 'text-green-400 hover:bg-green-900/30 hover:text-green-300' 
+                            theme === 'dark'
+                              ? 'text-green-400 hover:bg-green-900/30 hover:text-green-300'
                               : 'text-green-600 hover:bg-green-50'
                           }`}
                           title={medico.acceso_web_enabled ? 'Deshabilitar acceso web' : 'Habilitar acceso web'}
+                          aria-label={medico.acceso_web_enabled ? 'Deshabilitar acceso web' : 'Habilitar acceso web'}
                           disabled={toggleAccesoWeb.isPending}
                         >
                           {toggleAccesoWeb.isPending ? (
                             <LoadingSpinner size="sm" />
                           ) : medico.acceso_web_enabled ? (
-                            <XCircle className="w-5 h-5" />
+                            <XCircle className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <CheckCircle2 className="w-5 h-5" />
+                            <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                         <button
@@ -1095,14 +1127,15 @@ export default function Medicos() {
                                 : 'text-blue-600 hover:bg-blue-50'
                           }`}
                           title={medico.estado === 'activo' ? 'Poner en vacaciones' : 'Activar médico'}
+                          aria-label={medico.estado === 'activo' ? 'Poner en vacaciones' : 'Activar médico'}
                           disabled={toggleEstado.isPending}
                         >
                           {toggleEstado.isPending ? (
                             <LoadingSpinner size="sm" />
                           ) : medico.estado === 'activo' ? (
-                            <Palmtree className="w-5 h-5" />
+                            <Palmtree className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <UserCheck className="w-5 h-5" />
+                            <UserCheck className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                         <button
@@ -1113,12 +1146,13 @@ export default function Medicos() {
                               : 'text-red-600 hover:bg-red-50'
                           }`}
                           title="Eliminar médico"
+                          aria-label="Eliminar médico"
                           disabled={eliminarMedico.isPending}
                         >
                           {eliminarMedico.isPending ? (
                             <LoadingSpinner size="sm" />
                           ) : (
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                       </div>

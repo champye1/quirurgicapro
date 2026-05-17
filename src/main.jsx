@@ -6,7 +6,10 @@ import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from './contexts/ThemeContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import App from './App.jsx'
+import { initSentry } from './config/sentry.js'
 import './index.css'
+
+initSentry()
 
 const queryClient = new QueryClient({
   defaultOptions: {

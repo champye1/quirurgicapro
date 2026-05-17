@@ -445,12 +445,39 @@ export default function CrearPaciente() {
       showError('No se pudo obtener la información del doctor')
       return
     }
-    
+
     if (doctor.estado !== 'activo') {
       showError(`No puede crear solicitudes. Su estado actual es: ${doctor.estado === 'vacaciones' ? 'vacaciones' : doctor.estado}. Por favor, contacte al administrador si necesita crear solicitudes.`)
       return
     }
-    
+
+    // Validar nombre y apellido
+    if (formData.nombre.trim().length < 2) {
+      showError('El nombre debe tener al menos 2 caracteres')
+      return
+    }
+    if (formData.apellido.trim().length < 2) {
+      showError('El apellido debe tener al menos 2 caracteres')
+      return
+    }
+    if (!/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(formData.nombre)) {
+      showError('El nombre debe contener letras')
+      return
+    }
+    if (!/[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(formData.apellido)) {
+      showError('El apellido debe contener letras')
+      return
+    }
+
+    // Validar teléfono WhatsApp si se ingresó
+    if (formData.telefono) {
+      const telefonoLimpio = formData.telefono.replace(/\s/g, '')
+      if (!/^\+[1-9]\d{7,14}$/.test(telefonoLimpio)) {
+        showError('El teléfono debe estar en formato internacional: +56912345678')
+        return
+      }
+    }
+
     // Validar formato del RUT
     if (!isValidRutFormat(formData.rut)) {
       setRutError('El formato del RUT no es válido. Use el formato: 12.345.678-9')

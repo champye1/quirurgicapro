@@ -291,16 +291,18 @@ export default function Insumos() {
                 onClick={handleExportCSV}
                 className="btn-secondary flex items-center gap-2 text-sm"
                 title="Exportar a CSV"
+                aria-label="Exportar a CSV"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">CSV</span>
               </button>
               <button
                 onClick={handleExportExcel}
                 className="btn-secondary flex items-center gap-2 text-sm"
                 title="Exportar a Excel"
+                aria-label="Exportar a Excel"
               >
-                <FileSpreadsheet className="w-4 h-4" />
+                <FileSpreadsheet className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Excel</span>
               </button>
             </>
@@ -340,6 +342,7 @@ export default function Insumos() {
                 onChange={(e) => setBusqueda(sanitizeString(e.target.value, { trim: false }))}
                 placeholder={`Buscar por ${filtroTipo === 'codigo' ? 'código' : 'nombre'}...`}
                 className="input-field pl-10"
+                aria-label="Buscar insumos"
               />
             </div>
           </div>
@@ -347,6 +350,7 @@ export default function Insumos() {
             value={filtroTipo}
             onChange={(e) => setFiltroTipo(sanitizeString(e.target.value))}
             className="input-field w-auto"
+            aria-label="Criterio de búsqueda"
           >
             <option value="nombre">Por Nombre</option>
             <option value="codigo">Por Código</option>
@@ -511,19 +515,22 @@ export default function Insumos() {
                           <button
                             onClick={() => iniciarEdicion(insumo)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                            aria-label="Editar insumo"
+                            title="Editar insumo"
                           >
-                            <Edit className="w-5 h-5" />
+                            <Edit className="w-5 h-5" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => handleEliminar(insumo)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded"
                             disabled={eliminarInsumo.isPending}
                             title="Eliminar insumo"
+                            aria-label="Eliminar insumo"
                           >
                             {eliminarInsumo.isPending ? (
                               <LoadingSpinner size="sm" />
                             ) : (
-                              <Trash2 className="w-5 h-5" />
+                              <Trash2 className="w-5 h-5" aria-hidden="true" />
                             )}
                           </button>
                         </div>
