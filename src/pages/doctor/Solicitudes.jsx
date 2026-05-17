@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { Clock, CheckCircle2, XCircle, Edit, X, Package, CalendarClock } from 'lucide-react'
+import { Clock, CheckCircle2, XCircle, Edit, X, Package, CalendarClock, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { HORAS_SELECT } from '../../utils/horasOpciones'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -28,6 +28,7 @@ export default function Solicitudes() {
   })
   const [insumoSeleccionado, setInsumoSeleccionado] = useState('')
   const [cantidadInsumo, setCantidadInsumo] = useState(1)
+  const [solicitudACancelar, setSolicitudACancelar] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
@@ -290,6 +291,24 @@ export default function Solicitudes() {
     return estados[estado] || estados.pendiente
   }
 
+  const cancelarSolicitud = useMutation({
+    mutationFn: async (solicitudId) => {
+      const { error } = await supabase
+        .from('surgery_requests')
+        .update({ estado: 'cancelada', updated_at: new Date().toISOString() })
+        .eq('id', solicitudId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['solicitudes-doctor'])
+      showSuccess('Solicitud cancelada')
+      setSolicitudACancelar(null)
+    },
+    onError: (error) => {
+      showError('Error al cancelar: ' + (error.message || 'Error desconocido'))
+    },
+  })
+
   // Notificar a pabellón que el paciente/doctor solicitó reagendamiento (vía RPC)
   const solicitarReagendamiento = useMutation({
     mutationFn: async (solicitud) => {
@@ -454,13 +473,24 @@ export default function Solicitudes() {
                     Creada el {format(new Date(solicitud.created_at), 'dd/MM/yyyy HH:mm')}
                   </div>
                   {solicitud.estado === 'pendiente' && (
-                    <button
-                      onClick={() => handleEditarClick(solicitud)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Editar
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSolicitudACancelar(solicitud)}
+                        className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition-colors flex items-center gap-2 border border-red-200"
+                        aria-label="Cancelar solicitud"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => handleEditarClick(solicitud)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
+                        aria-label="Editar solicitud"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Editar
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -479,6 +509,39 @@ export default function Solicitudes() {
           </>
         )}
       </div>
+
+      {/* Modal Confirmar Cancelación */}
+      <Modal
+        isOpen={!!solicitudACancelar}
+        onClose={() => setSolicitudACancelar(null)}
+        title="Cancelar Solicitud"
+        aria-label="Confirmar cancelación de solicitud"
+      >
+        {solicitudACancelar && (
+          <div className="space-y-4">
+            <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              ¿Seguro que quieres cancelar la solicitud de{' '}
+              <strong>{solicitudACancelar.patients?.nombre} {solicitudACancelar.patients?.apellido}</strong>?
+            </p>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Esta acción no se puede deshacer. La solicitud quedará marcada como cancelada.
+            </p>
+            <div className="flex gap-3 justify-end pt-2">
+              <Button variant="secondary" type="button" onClick={() => setSolicitudACancelar(null)}>
+                Volver
+              </Button>
+              <Button
+                type="button"
+                loading={cancelarSolicitud.isPending}
+                onClick={() => cancelarSolicitud.mutate(solicitudACancelar.id)}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Sí, cancelar
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Modal de Edición */}
       <Modal

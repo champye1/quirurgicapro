@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import {
   Calendar, Users, Package, Bell, CheckCircle,
   ArrowRight, Shield, Clock, ChevronRight, Mail,
-  Stethoscope, ClipboardList, BarChart3
+  Stethoscope, ClipboardList, BarChart3, Zap
 } from 'lucide-react'
 
 const FEATURES = [
@@ -247,6 +247,103 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── PRECIOS ── */}
+      <section className="py-24 px-4 sm:px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+              Precio único, sin sorpresas
+            </h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              Pagas una vez y el sistema es tuyo. Sin mensualidades, sin cobros ocultos.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {/* Plan Clínica */}
+            <div className="relative rounded-3xl border-2 border-blue-600 p-8 bg-white shadow-xl shadow-blue-100">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="bg-blue-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full">
+                  Más popular
+                </span>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-2">Plan Clínica</p>
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-5xl font-black text-slate-900">$990</span>
+                  <span className="text-slate-500 text-lg mb-1">USD</span>
+                </div>
+                <p className="text-slate-500 text-sm">Pago único · Licencia permanente</p>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Usuarios ilimitados (médicos + pabellón)',
+                  'Agenda quirúrgica completa',
+                  'Control de inventario',
+                  'Notificaciones automáticas',
+                  'Auditoría y trazabilidad',
+                  'Dashboard en tiempo real',
+                  '1 mes de soporte incluido',
+                  'Instalación y configuración inicial',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/contacto"
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+              >
+                Solicitar demo gratuita
+              </Link>
+            </div>
+
+            {/* Plan con soporte extendido */}
+            <div className="rounded-3xl border border-slate-200 p-8 bg-slate-50">
+              <div className="mb-6">
+                <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Plan Clínica + Soporte</p>
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-5xl font-black text-slate-900">$1.490</span>
+                  <span className="text-slate-500 text-lg mb-1">USD</span>
+                </div>
+                <p className="text-slate-500 text-sm">Pago único · Todo incluido</p>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Todo lo del Plan Clínica',
+                  '6 meses de soporte prioritario',
+                  'Personalizaciones menores',
+                  'Capacitación al equipo (2 sesiones)',
+                  'Migración de datos existentes',
+                  'Actualizaciones durante 1 año',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <Zap className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/contacto"
+                className="block w-full text-center bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+              >
+                Consultar
+              </Link>
+            </div>
+          </div>
+
+          <p className="text-center text-slate-400 text-sm mt-10">
+            ¿Clínica pequeña con presupuesto ajustado?{' '}
+            <Link to="/contacto" className="text-blue-600 hover:underline font-medium">
+              Conversemos
+            </Link>{' '}
+            — tenemos opciones flexibles.
+          </p>
         </div>
       </section>
 

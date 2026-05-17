@@ -4,8 +4,9 @@ import { supabase } from './config/supabase'
 import { logger } from './utils/logger'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
-const LandingPage       = lazy(() => import('./pages/public/LandingPage'))
+const LandingPage        = lazy(() => import('./pages/public/LandingPage'))
 const PoliticaPrivacidad = lazy(() => import('./pages/public/PoliticaPrivacidad'))
+const NotFound           = lazy(() => import('./pages/public/NotFound'))
 const Inicio            = lazy(() => import('./pages/auth/Inicio'))
 const LoginPabellon     = lazy(() => import('./pages/auth/LoginPabellon'))
 const LoginDoctor       = lazy(() => import('./pages/auth/LoginDoctor'))
@@ -223,8 +224,8 @@ function AppContent() {
         } 
       />
       
-      <Route 
-        path="/doctor/*" 
+      <Route
+        path="/doctor/*"
         element={
           user && userRole === 'doctor' && !sessionStorage.getItem('validating_login') ? (
             <DoctorLayout />
@@ -236,8 +237,10 @@ function AppContent() {
           ) : (
             <Navigate to="/login/doctor" replace />
           )
-        } 
+        }
       />
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </Suspense>
   )
