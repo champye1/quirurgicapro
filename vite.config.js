@@ -13,6 +13,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    target: 'esnext',
+  },
   optimizeDeps: {
     exclude: ['xlsx'],
   },

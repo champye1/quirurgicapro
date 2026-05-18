@@ -31,6 +31,9 @@
     "xlsx": "^0.18.5",
     "zod": "^3.22.4"
   },
+  "overrides": {
+    "esbuild": "0.28.0"
+  },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
