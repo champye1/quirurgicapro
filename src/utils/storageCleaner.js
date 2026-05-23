@@ -29,22 +29,3 @@ export function clearAllAppData() {
   }
 }
 
-/**
- * Limpia solo los datos sensibles, manteniendo preferencias del usuario
- */
-export function clearSensitiveData() {
-  try {
-    // Limpiar intentos de login
-    clearAllLoginAttempts()
-
-    // Limpiar datos de solicitudes quirúrgicas
-    sessionStorage.removeItem('solicitud_gestionando')
-    sessionStorage.removeItem('slot_seleccionado')
-    sessionStorage.removeItem('validating_login')
-
-    // Limpiar recordatorios temporales
-    localStorage.removeItem('recordatorio-temporal')
-  } catch (error) {
-    console.error('Error al limpiar datos sensibles:', error)
-  }
-}

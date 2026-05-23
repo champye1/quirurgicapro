@@ -23,4 +23,3 @@ export function initSentry() {
   })
 }
 
-export { Sentry }

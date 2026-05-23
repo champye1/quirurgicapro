@@ -87,61 +87,6 @@ export function sanitizeString(input, options = {}) {
 }
 
 /**
- * Sanitiza un objeto completo de datos de formulario
- * @param {Object} data - Objeto con los datos del formulario
- * @param {Object} options - Opciones de sanitización por campo
- * @returns {Object} - Objeto sanitizado
- */
-export function sanitizeFormData(data, options = {}) {
-  if (!data || typeof data !== 'object') {
-    return data
-  }
-
-  const sanitized = {}
-
-  for (const [key, value] of Object.entries(data)) {
-    if (typeof value === 'string') {
-      // Usar opciones específicas del campo si existen, sino usar las generales
-      const fieldOptions = options[key] || options.default || {}
-      sanitized[key] = sanitizeString(value, fieldOptions)
-    } else if (Array.isArray(value)) {
-      // Sanitizar arrays recursivamente
-      sanitized[key] = value.map(item => {
-        if (typeof item === 'string') {
-          const fieldOptions = options[key] || options.default || {}
-          return sanitizeString(item, fieldOptions)
-        } else if (typeof item === 'object') {
-          return sanitizeFormData(item, options)
-        }
-        return item
-      })
-    } else if (typeof value === 'object' && value !== null) {
-      // Sanitizar objetos anidados recursivamente
-      sanitized[key] = sanitizeFormData(value, options)
-    } else {
-      // Mantener otros tipos de datos sin cambios
-      sanitized[key] = value
-    }
-  }
-
-  return sanitized
-}
-
-/**
- * Hook helper para sanitizar inputs en tiempo real
- * @param {Function} setValue - Función para actualizar el valor
- * @param {Object} options - Opciones de sanitización
- * @returns {Function} - Función para usar en onChange
- */
-export function createSanitizedHandler(setValue, options = {}) {
-  return (e) => {
-    const value = e.target ? e.target.value : e
-    const sanitized = sanitizeString(value, options)
-    setValue(sanitized)
-  }
-}
-
-/**
  * Sanitiza un número (solo permite dígitos y un punto decimal)
  * @param {string|number} input - Valor a sanitizar
  * @returns {string} - String con solo números y punto decimal (o '' si no es string/number)
@@ -152,23 +97,6 @@ export function sanitizeNumber(input) {
   if (typeof input !== 'string') return ''
   const cleaned = input.replace(CONTROL_CHARS_REGEX, '')
   return cleaned.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
-}
-
-/**
- * Sanitiza un valor de hora: solo permite dígitos y un carácter ':' (formato HH:MM).
- * Útil para inputs de hora libres. No fuerza formato; solo elimina caracteres no permitidos.
- * @param {string} input - String a sanitizar
- * @returns {string} - String con solo dígitos y ':' (máx. un ':' y 4 dígitos para HHMM)
- */
-export function sanitizeTime(input) {
-  if (input == null || typeof input !== 'string') return ''
-  const s = input.replace(CONTROL_CHARS_REGEX, '').trim()
-  const allowed = s.replace(/[^\d:]/g, '')
-  const firstColon = allowed.indexOf(':')
-  if (firstColon === -1) return allowed.slice(0, 4)
-  const before = allowed.slice(0, firstColon).slice(0, 2)
-  const after = allowed.slice(firstColon + 1).replace(/:/g, '').slice(0, 2)
-  return before + ':' + after
 }
 
 /**
