@@ -51,9 +51,9 @@ export function useRealtimeNotifications(userId) {
           queryClient.invalidateQueries(['solicitudes-pendientes'])
           
           // Notificar cambios de estado importantes
-          if (payload.new.estado === 'aceptada' && payload.old.estado === 'pendiente') {
+          if (payload.new?.estado === 'aceptada' && payload.old?.estado === 'pendiente') {
             showSuccess('Tu solicitud ha sido aceptada')
-          } else if (payload.new.estado === 'rechazada' && payload.old.estado === 'pendiente') {
+          } else if (payload.new?.estado === 'rechazada' && payload.old?.estado === 'pendiente') {
             showInfo('Tu solicitud ha sido rechazada')
           }
         }
@@ -80,7 +80,7 @@ export function useRealtimeNotifications(userId) {
           queryClient.invalidateQueries(['cirugias-fecha'])
           
           // Notificar cancelaciones
-          if (payload.eventType === 'UPDATE' && payload.new.estado === 'cancelada' && payload.old.estado === 'programada') {
+          if (payload.eventType === 'UPDATE' && payload.new?.estado === 'cancelada' && payload.old?.estado === 'programada') {
             showInfo('Una cirugía ha sido cancelada')
           }
         }

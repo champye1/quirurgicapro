@@ -4,6 +4,7 @@
  */
 
 import { clearAllLoginAttempts } from './rateLimiter'
+import { logger } from './logger'
 
 /**
  * Limpia todos los datos de la aplicación almacenados en el navegador
@@ -25,7 +26,7 @@ export function clearAllAppData() {
     // El tema se mantiene (no es sensible)
     // localStorage.removeItem('app-theme') // Opcional: descomentar si quieres resetear el tema también
   } catch (error) {
-    console.error('Error al limpiar datos de almacenamiento:', error)
+    logger.errorWithContext('Error al limpiar datos de almacenamiento', error)
   }
 }
 

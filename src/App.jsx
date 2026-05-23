@@ -125,7 +125,7 @@ function AppContent() {
       
       // Manejar sesión expirada en catch también
       if (error.status === 401 || error.message?.includes('JWT') || error.message?.includes('expired')) {
-        console.warn('Sesión expirada. Redirigiendo al login...')
+        logger.warn('Sesión expirada. Redirigiendo al login...')
         await supabase.auth.signOut()
         setUser(null)
         setUserRole(null)

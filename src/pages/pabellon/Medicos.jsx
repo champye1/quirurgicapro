@@ -386,7 +386,7 @@ export default function Medicos() {
         })
 
         if (functionError) {
-          console.error('Error invocando update-doctor-password:', functionError)
+          logger.errorWithContext('Error invocando update-doctor-password', functionError)
           throw new Error(functionError.message || 'Error al actualizar contraseña')
         }
         

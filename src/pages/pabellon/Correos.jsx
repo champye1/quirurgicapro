@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
+import { logger } from '../../utils/logger'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import {
@@ -173,14 +174,14 @@ export default function Correos() {
         queryClient.invalidateQueries(['external-messages'])
         queryClient.invalidateQueries(['external-messages-count'])
       } else {
-        console.log('poll-gmail response:', data)
+        logger.debug('poll-gmail response:', data)
         showSuccess('No hay mensajes nuevos en Gmail.')
       }
     } catch (e) {
-      console.error('poll-gmail error completo:', e, JSON.stringify(e, Object.getOwnPropertyNames(e)))
+      logger.errorWithContext('poll-gmail error', e)
       // Intentar extraer el body del error
       if (e?.context) {
-        try { const body = await e.context.json(); console.error('error body:', body) } catch { /* no-op */ }
+        try { const body = await e.context.json(); logger.debug('poll-gmail error body:', body) } catch { /* no-op */ }
       }
       showError('Error al consultar Gmail: ' + (e?.message || 'Error desconocido'))
     } finally {

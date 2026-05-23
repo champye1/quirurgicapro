@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../config/supabase'
+import { logger } from '../utils/logger'
 import { Calendar, CheckCircle, XCircle, Lock, FileCheck } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -65,7 +66,7 @@ export default function CalendarioPabellonesGrid({ theme, inlineMode = false, on
       const { data, error } = await supabase.rpc('get_estado_slots_pabellon', { p_fecha: fecha })
       if (error) {
         // Si la función RPC no existe (404) o falla, no bloquear: mostrar slots vacíos y permitir crear reserva
-        console.warn('get_estado_slots_pabellon:', error.message)
+        logger.warn('get_estado_slots_pabellon:', error.message)
         return []
       }
       return data || []

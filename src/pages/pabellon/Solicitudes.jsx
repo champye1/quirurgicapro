@@ -166,18 +166,18 @@ export default function Solicitudes() {
 
     const payload = { tipo, nombreDoctor, nombrePaciente, fechaCirugia, observaciones }
 
-    // Notificar al médico
+    // Notificar al médico (fire-and-forget: no bloquea la operación principal)
     if (solicitud.doctors?.telefono) {
       supabase.functions.invoke('send-whatsapp', {
         body: { ...payload, to: solicitud.doctors.telefono, destinatario: 'doctor' },
-      }).catch(() => {})
+      }).catch((err) => logger.warn('WhatsApp al médico falló (no crítico):', err?.message))
     }
 
-    // Notificar al paciente
+    // Notificar al paciente (fire-and-forget)
     if (solicitud.patients?.telefono) {
       supabase.functions.invoke('send-whatsapp', {
         body: { ...payload, to: solicitud.patients.telefono, destinatario: 'paciente' },
-      }).catch(() => {})
+      }).catch((err) => logger.warn('WhatsApp al paciente falló (no crítico):', err?.message))
     }
   }
 
