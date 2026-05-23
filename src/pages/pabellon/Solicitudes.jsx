@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { CheckCircle2, XCircle, Clock, Eye, Calendar, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Filter, Lock, Search } from 'lucide-react'
+import { CheckCircle2, Clock, Eye, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Lock, Search } from 'lucide-react'
 import { format } from 'date-fns'
 import { codigosOperaciones } from '../../data/codigosOperaciones'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -181,32 +181,6 @@ export default function Solicitudes() {
     }
   }
 
-  const aceptarSolicitud = useMutation({
-    mutationFn: async (solicitud) => {
-      const { error } = await supabase
-        .from('surgery_requests')
-        .update({ estado: 'aceptada', updated_at: new Date().toISOString() })
-        .eq('id', solicitud.id)
-
-      if (error) throw error
-      return solicitud
-    },
-    onSuccess: (solicitud) => {
-      queryClient.invalidateQueries(['solicitudes'])
-      queryClient.invalidateQueries(['solicitudes-pendientes'])
-      showSuccess('Solicitud aceptada exitosamente')
-      enviarWhatsApp(solicitud, 'aceptada')
-    },
-    onError: (error) => {
-      const errorMessage = error.message || error.toString() || 'Error desconocido'
-      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
-        showError('Error de conexión. Verifique su conexión a internet e intente nuevamente.')
-      } else {
-        showError('Error al aceptar la solicitud: ' + errorMessage)
-      }
-    },
-  })
-
   const [showConfirmRechazar, setShowConfirmRechazar] = useState(false)
   const [solicitudARechazar, setSolicitudARechazar] = useState(null)
 
@@ -236,11 +210,6 @@ export default function Solicitudes() {
       }
     },
   })
-
-  const handleRechazarClick = (solicitud) => {
-    setSolicitudARechazar(solicitud)
-    setShowConfirmRechazar(true)
-  }
 
   const confirmarRechazar = () => {
     if (solicitudARechazar) {

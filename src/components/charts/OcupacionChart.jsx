@@ -59,7 +59,7 @@ export default function OcupacionChart({ data, mode = 'porcentaje' }) {
           itemStyle={{
             color: isDark ? '#cbd5e1' : '#475569',
           }}
-          formatter={(value, name) => {
+          formatter={(value, _name) => {
             if (mode === 'porcentaje') {
               const val = typeof value === 'number' ? value.toFixed(1) : value
               return [`${val} %`, 'Ocupación promedio']

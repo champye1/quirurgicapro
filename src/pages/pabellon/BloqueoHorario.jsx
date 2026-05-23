@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { Calendar, Clock, Users, X, Edit, CheckCircle, XCircle, Lock } from 'lucide-react'
+import { Clock, X, Edit, CheckCircle, XCircle, Lock } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
 import { sanitizeString, sanitizeNumber } from '../../utils/sanitizeInput'
 import { HORAS_SELECT } from '../../utils/horasOpciones'
@@ -10,7 +10,6 @@ import Pagination from '../../components/common/Pagination'
 const HORAS_PARA_PREVIEW = HORAS_SELECT
 import ConfirmModal from '../../components/common/ConfirmModal'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
-import { format } from 'date-fns'
 import { useTheme } from '../../contexts/ThemeContext'
 
 export default function BloqueoHorario() {

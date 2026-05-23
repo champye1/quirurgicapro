@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { Mail, Lock, AlertCircle, Stethoscope, ArrowLeft, Building2, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, AlertCircle, Stethoscope, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { sanitizeEmail, sanitizePassword } from '../../utils/sanitizeInput'
 import { 
   isLocked, 

@@ -9,7 +9,7 @@ import { sanitizeString, sanitizeEmail, sanitizeCode, sanitizeRut, sanitizePassw
 import { logger } from '../../utils/logger'
 import { useDebounce } from '../../hooks/useDebounce'
 import { handleMutationError } from '../../utils/errorHandler'
-import { exportToCSV, exportToExcel, formatRelatedObject } from '../../utils/exportData'
+import { exportToCSV, exportToExcel } from '../../utils/exportData'
 import Pagination from '../../components/common/Pagination'
 import ConfirmModal from '../../components/common/ConfirmModal'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
@@ -649,6 +649,7 @@ export default function Medicos() {
         setFormData(prev => ({ ...prev, username: nuevoUsername }))
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.nombre, formData.apellido])
 
   const iniciarEdicion = (medico) => {

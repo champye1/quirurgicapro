@@ -24,7 +24,7 @@ export async function testSupabaseConnection() {
     }
     
     // Intentar una consulta simple
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('users')
       .select('count')
       .limit(1)

@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import {
   Home, FileText, Calendar, Clock, Users, Package, Mail, FileSearch,
 } from 'lucide-react'
@@ -28,8 +28,6 @@ const MENU = [
 ]
 
 export default function PabellonLayout() {
-  const navigate = useNavigate()
-
   // Badge: correos externos no leídos
   const { data: correosNoLeidos = 0 } = useQuery({
     queryKey: ['external-messages-unread'],

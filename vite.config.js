@@ -15,6 +15,19 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          query: ['@tanstack/react-query'],
+          charts: ['recharts'],
+          xlsx: ['xlsx'],
+          sentry: ['@sentry/react'],
+          motion: ['framer-motion'],
+          'date-fns': ['date-fns'],
+        },
+      },
+    },
   },
   optimizeDeps: {
     exclude: ['xlsx'],

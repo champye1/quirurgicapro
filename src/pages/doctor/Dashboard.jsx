@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { Calendar, FileText, CheckCircle2, Clock } from 'lucide-react'
+import { Calendar, CheckCircle2, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useTheme } from '../../contexts/ThemeContext'

@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle, CheckCircle2, Info, Lock, Activity, X, Stethoscope, XCircle, AlertTriangle, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle2, Info, Lock, Activity, X, Stethoscope, XCircle, AlertTriangle, Search } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
 import { sanitizeString } from '../../utils/sanitizeInput'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -23,12 +23,8 @@ import {
   isSameDay,
   startOfWeek,
   eachDayOfInterval,
-  setHours,
-  setMinutes,
-  addMinutes,
   isSameMonth,
   getWeek,
-  parseISO,
   isPast,
   startOfDay,
 } from 'date-fns'
@@ -149,8 +145,6 @@ const MonthView = ({ anio, monthIndex, onWeekClick }) => {
     return eachWeekOfInterval({ start, end }, { weekStartsOn: 1 })
   }, [anio, monthIndex])
 
-  const hoy = startOfDay(new Date())
-
   return (
     <div className="space-y-5 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-2 sm:px-4 lg:px-0">
       <div className="bg-blue-50 border border-blue-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 xl:p-8 flex items-center gap-3 sm:gap-4 lg:gap-5">
@@ -238,8 +232,6 @@ const WeekView = ({ weekStart, cirugias, pabellonId, onDayClick, pabellones, sel
     })
   }, [weekStart])
 
-  const hoy = startOfDay(new Date())
-
   // Calcular ocupación global por día (suma de todos los pabellones)
   const getOcupacionGlobal = (day) => {
     const dayStr = format(day, 'yyyy-MM-dd')
@@ -280,7 +272,7 @@ const WeekView = ({ weekStart, cirugias, pabellonId, onDayClick, pabellones, sel
 
       {/* Grilla de días - Completamente Responsive (7 días: Lunes a Domingo) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 auto-rows-fr items-stretch">
-        {days.map((day, index) => {
+        {days.map((day) => {
           const dayStr = format(day, 'yyyy-MM-dd')
           const esDiaPasado = isPast(startOfDay(day)) && !isSameDay(day, new Date())
           const esSeleccionado = selectedDay && isSameDay(day, selectedDay)
@@ -368,23 +360,6 @@ const WeekView = ({ weekStart, cirugias, pabellonId, onDayClick, pabellones, sel
 
 // Constantes para slots de tiempo (8:00 AM a 7:00 PM en bloques de 1 hora)
 const TIME_SLOTS = Array.from({ length: 12 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`)
-
-// Helper para obtener el estado visual de una celda
-const getCellStatusClass = (status, isSelected, isAvailable) => {
-  if (status === 'occupied') {
-    return 'bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer'
-  }
-  if (status === 'blocked_agreement') {
-    return 'bg-slate-800 border-amber-400/50 cursor-not-allowed'
-  }
-  if (isSelected) {
-    return 'bg-blue-100 border-blue-500 shadow-lg shadow-blue-200/50 cursor-pointer'
-  }
-  if (isAvailable) {
-    return 'bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-400 cursor-pointer'
-  }
-  return 'bg-slate-50 border-slate-200 cursor-not-allowed'
-}
 
 // Componente DayView (Slots Horarios)
 const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSlot, currentRequest, onConfirmSlot, onSlotClick, showError }) => {
@@ -491,10 +466,12 @@ const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSl
   }
 
   // Calcula el estado de cada celda usando useMemo para optimizar
-  const gridData = useMemo(() => 
-    TIME_SLOTS.map((_, tIdx) => 
+  const gridData = useMemo(() =>
+    TIME_SLOTS.map((_, tIdx) =>
       PAVILIONS.map((_, pIdx) => getGridStatus(tIdx, pIdx, day, bloqueos))
-    ), 
+    ),
+    // PAVILIONS y getGridStatus son constantes de módulo — no cambian entre renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [day, bloqueos, cirugias, pabellonesMostrar, pabellon1Bloqueado]
   )
 
@@ -721,7 +698,6 @@ const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSl
                 const pabellon = pabellonesMostrar[pIdx]
                 const info = gridData[tIdx][pIdx]
                 const isSelected = selectedSlot?.pabellonId === pabellon?.id && selectedSlot?.time === time
-                const isOccupied = info.status === 'occupied' || info.status === 'blocked_agreement'
                 const isAvailable = info.status === 'free' && pabellon
                 
                 if (!pabellon) {
@@ -1039,6 +1015,7 @@ export default function Calendario() {
     }
 
     loadReagendar()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReagendarMode, location.state?.surgeryRequestId])
   
   // Mutation para programar la cirugía usando función PostgreSQL atómica
@@ -1311,11 +1288,6 @@ export default function Calendario() {
     },
   })
 
-  const handleCancelarClick = (cirugia) => {
-    setCirugiaACancelar(cirugia)
-    setShowConfirmCancelar(true)
-  }
-
   const confirmarCancelar = () => {
     if (cirugiaACancelar) {
       cancelarCirugia.mutate(cirugiaACancelar.id)
@@ -1331,9 +1303,6 @@ export default function Calendario() {
   const { data: cirugias = [], isLoading: loadingCirugias } = useQuery({
     queryKey: ['calendario-anual-cirugias', anio, filtroPaciente],
     queryFn: async () => {
-      // Si hay filtro de paciente, buscar también en fechas pasadas
-      const fechaLimite = filtroPaciente ? null : fechaInicioStr
-      
       let query = supabase
         .from('surgeries')
         .select(`

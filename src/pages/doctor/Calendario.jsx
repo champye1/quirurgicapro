@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle, Info, XCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Info, XCircle } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
 import Modal from '../../components/common/Modal'
 import Button from '../../components/common/Button'
@@ -15,15 +15,9 @@ import {
   endOfWeek,
   format,
   addDays,
-  isSameDay,
-  startOfWeek,
-  eachDayOfInterval,
-  setHours,
-  setMinutes,
-  addMinutes,
   isSameMonth,
   getWeek,
-  parseISO,
+  eachDayOfInterval,
 } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -151,7 +145,7 @@ const MonthView = ({ anio, monthIndex, onWeekClick }) => {
 }
 
 // Componente WeekView (Grilla de Días)
-const WeekView = ({ weekStart, cirugias, onDayClick, pabellones }) => {
+const WeekView = ({ weekStart, cirugias, onDayClick, pabellones: _pabellones }) => {
   const days = useMemo(() => {
     return eachDayOfInterval({
       start: weekStart,

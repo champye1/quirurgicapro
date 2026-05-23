@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { Search, Filter, Download, FileSpreadsheet, Calendar, User, Database, Clock } from 'lucide-react'
+import { Search, Download, FileSpreadsheet, User, Database, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useDebounce } from '../../hooks/useDebounce'

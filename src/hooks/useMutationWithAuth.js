@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { supabase } from '../config/supabase'
 import { logger } from '../utils/logger'
 import { useNotifications } from './useNotifications'
@@ -8,7 +8,6 @@ import { useNotifications } from './useNotifications'
  * Maneja errores 401 (sesión expirada) y errores de red automáticamente
  */
 export function useMutationWithAuth(options = {}) {
-  const queryClient = useQueryClient()
   const { showError } = useNotifications()
 
   // Manejar errores de autenticación y red

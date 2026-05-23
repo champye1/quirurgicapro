@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './config/supabase'
 import { logger } from './utils/logger'
 import LoadingSpinner from './components/common/LoadingSpinner'
@@ -25,7 +25,6 @@ function isInvalidRefreshTokenError(error) {
 }
 
 function AppContent() {
-  const location = useLocation()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState(null)

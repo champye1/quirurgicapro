@@ -3,14 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
 import {
-  Clock,
   Activity,
-  Bed,
-  AlertCircle,
   CheckCircle2,
   Plus,
-  X,
-  Bell,
   Inbox,
   LayoutGrid,
   TrendingUp,
@@ -27,7 +22,7 @@ import { es } from 'date-fns/locale'
 import Card from '../../components/common/Card'
 import OcupacionChart from '../../components/charts/OcupacionChart'
 import { useNotifications } from '../../hooks/useNotifications'
-import { CardSkeleton, MetricSkeleton } from '../../components/common/Skeleton'
+import { MetricSkeleton } from '../../components/common/Skeleton'
 import Tooltip from '../../components/common/Tooltip'
 import Modal from '../../components/common/Modal'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -253,9 +248,6 @@ export default function Dashboard() {
       }
     },
   })
-
-  // Camillas disponibles por hora (simplificado)
-  const horas = Array.from({ length: 12 }, (_, i) => i + 8) // 8 AM a 7 PM
 
   // Recordatorios
   const { data: recordatorios = [] } = useQuery({
@@ -564,7 +556,7 @@ export default function Dashboard() {
                 navigate('/pabellon/calendario')
               },
             },
-          ].map((stat, i) => (
+          ].map((stat) => (
             <Tooltip key={stat.id} content={stat.tooltip}>
               <Card 
                 hover={!!stat.onClick}
