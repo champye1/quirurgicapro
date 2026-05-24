@@ -132,7 +132,7 @@ export default function Medicos() {
         const busquedaLower = debouncedBusqueda.toLowerCase()
         const nombreCompleto = `${medico.nombre} ${medico.apellido}`.toLowerCase()
         const rutFormateado = formatRut(medico.rut).toLowerCase()
-        const emailLower = medico.email.toLowerCase()
+        const emailLower = (medico.email || '').toLowerCase()
         
         if (!nombreCompleto.includes(busquedaLower) && 
             !rutFormateado.includes(busquedaLower) && 
@@ -321,6 +321,7 @@ export default function Medicos() {
         apellido: '',
         rut: '',
         email: '',
+        telefono: '',
         especialidad: '',
         estado: 'activo',
         acceso_web_enabled: false,
@@ -328,7 +329,7 @@ export default function Medicos() {
         password: '',
       })
       setShowPassword(false)
-      
+
       // Mostrar mensaje según si se creó el usuario automáticamente o no
       if (result.tempPassword) {
         const detalle = `👤 Usuario: ${result.username || result.email}\n` +
@@ -720,6 +721,7 @@ export default function Medicos() {
                 apellido: '',
                 rut: '',
                 email: '',
+                telefono: '',
                 especialidad: '',
                 estado: 'activo',
                 acceso_web_enabled: false,
@@ -1012,6 +1014,8 @@ export default function Medicos() {
                 onClick={() => {
                   setMostrarFormulario(false)
                   setMedicoEditando(null)
+                  setFieldErrors({})
+                  setTouchedFields({})
                 }}
                 className="btn-secondary"
                 disabled={crearMedico.isPending || actualizarMedico.isPending}

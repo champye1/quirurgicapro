@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
 import { Calendar, CheckCircle2, Clock } from 'lucide-react'
 import { format } from 'date-fns'
@@ -8,6 +9,7 @@ import { logger } from '../../utils/logger'
 
 export default function Dashboard() {
   const { theme } = useTheme()
+  const navigate = useNavigate()
   const { data: doctor, isLoading: loadingDoctor, isError: errorDoctor } = useQuery({
     queryKey: ['doctor-actual'],
     queryFn: async () => {
@@ -87,8 +89,7 @@ export default function Dashboard() {
         .is('deleted_at', null)
         .order('fecha', { ascending: true })
         .order('hora_inicio', { ascending: true })
-        .limit(5)
-      
+
       if (error) throw error
       return data
     },
@@ -310,13 +311,12 @@ export default function Dashboard() {
                     <p className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{recordatorio.titulo}</p>
                     <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-slate-200' : 'text-gray-600'}`}>{recordatorio.contenido}</p>
                     {recordatorio.relacionado_con && (
-                      <div className={`mt-2 p-2 rounded ${
-                        theme === 'dark' ? 'bg-blue-900/30' : 'bg-blue-50'
-                      }`}>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-blue-200' : 'text-blue-800'}`}>
-                          Relacionado con cirugía ID: {recordatorio.relacionado_con}
-                        </p>
-                      </div>
+                      <button
+                        onClick={() => navigate('/doctor/calendario')}
+                        className="text-xs text-blue-600 hover:underline mt-1 block"
+                      >
+                        Ver en calendario →
+                      </button>
                     )}
                     <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-400'}`}>
                       {format(new Date(recordatorio.created_at), 'dd/MM/yyyy HH:mm')}

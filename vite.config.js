@@ -31,6 +31,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['xlsx'],
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   test: {
     globals: true,

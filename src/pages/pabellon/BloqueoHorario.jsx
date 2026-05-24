@@ -309,6 +309,14 @@ export default function BloqueoHorario() {
       return
     }
     
+    // Calcular fecha_auto_liberacion a partir de dias_auto_liberacion para que DB y display sean correctos
+    let fechaAutoLiberacion = null
+    if (dias != null && dias > 0 && formData.fecha) {
+      const base = new Date(formData.fecha + 'T12:00:00')
+      base.setDate(base.getDate() + dias)
+      fechaAutoLiberacion = base.toISOString().split('T')[0]
+    }
+
     const payload = {
       doctor_id: formData.doctor_id || null,
       operating_room_id: formData.operating_room_id,
@@ -317,6 +325,7 @@ export default function BloqueoHorario() {
       hora_fin: formData.hora_fin,
       motivo: formData.motivo || null,
       dias_auto_liberacion: dias != null && dias > 0 ? dias : null,
+      fecha_auto_liberacion: fechaAutoLiberacion,
       vigencia_hasta: null,
     }
     if (bloqueoEditando) {

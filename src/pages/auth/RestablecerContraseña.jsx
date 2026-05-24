@@ -17,20 +17,33 @@ export default function RestablecerContraseña() {
     const hash = window.location.hash || ''
     const params = new URLSearchParams(hash.replace(/^#/, ''))
 
-    if (params.get('error')) {
+    if (params.get('error') || !params.get('access_token')) {
       setLinkStatus('expired')
       return
     }
 
-    // Supabase pone access_token y type=recovery en el hash; el cliente recupera la sesión al hacer getSession
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    // Supabase v2: el cliente procesa el hash de forma asíncrona.
+    // Escuchar PASSWORD_RECOVERY evita la race condition de llamar getSession() demasiado pronto.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
         setLinkStatus('valid')
-      } else {
-        // Si no hay sesión tras procesar el hash, puede ser enlace expirado
-        setLinkStatus('expired')
       }
     })
+
+    // Fallback: si el cliente ya procesó el hash antes del mount (caso síncrono)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setLinkStatus('valid')
+    })
+
+    // Si ningún evento válido llega en 4 segundos, el token expiró
+    const timer = setTimeout(() => {
+      setLinkStatus(prev => prev === 'checking' ? 'expired' : prev)
+    }, 4000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timer)
+    }
   }, [])
 
   const handleSubmit = async (e) => {
@@ -55,7 +68,6 @@ export default function RestablecerContraseña() {
       }
       await supabase.auth.signOut()
       navigate('/login/doctor', { replace: true })
-      window.location.reload()
     } catch (err) {
       setError(err.message || 'Error inesperado.')
     } finally {

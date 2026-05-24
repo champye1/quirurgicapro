@@ -187,7 +187,7 @@ async function parseMessage(accessToken: string, messageId: string): Promise<Par
 
 /** Marca un mensaje como leído en Gmail */
 async function markAsRead(accessToken: string, messageId: string): Promise<void> {
-  await fetch(`${GMAIL_API_BASE}/messages/${messageId}/modify`, {
+  const res = await fetch(`${GMAIL_API_BASE}/messages/${messageId}/modify`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -195,6 +195,10 @@ async function markAsRead(accessToken: string, messageId: string): Promise<void>
     },
     body: JSON.stringify({ removeLabelIds: ['UNREAD'] }),
   })
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText)
+    throw new Error(`markAsRead ${messageId} failed (${res.status}): ${detail}`)
+  }
 }
 
 serve(async (req) => {
@@ -289,13 +293,14 @@ serve(async (req) => {
           })
 
         if (insertError) {
-          // Ignorar duplicados (unique constraint gmail_message_id)
-          if (insertError.code !== '23505') {
+          if (insertError.code === '23505') {
+            // Ya existe en BD — marcar igualmente como leído para que no vuelva a aparecer
+            await markAsRead(accessToken, msgId)
+          } else {
             errors.push(`Error insertando ${msgId}: ${insertError.message}`)
           }
         } else {
           inserted++
-          // Marcar como leído en Gmail para no volver a procesarlo
           await markAsRead(accessToken, msgId)
         }
       } catch (e) {

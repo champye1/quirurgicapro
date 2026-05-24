@@ -273,7 +273,9 @@ export default function CrearPaciente() {
         hora_fin_recomendada_2: dejarAPabellon ? null : (data.hora_fin_recomendada_2 || null),
         fecha_preferida_2: dejarAPabellon ? null : (data.fecha_preferida_2 || null),
         operating_room_id_preferido_2: dejarAPabellon ? null : (data.operating_room_id_preferido_2 || null),
-        horarios_preferidos_extra: (data.horarios_extra?.length ? data.horarios_extra : null),
+        horarios_preferidos_extra: (data.horarios_extra?.length
+          ? data.horarios_extra.map(({ _key: _k, ...h }) => h)
+          : null),
       }
       const { data: solicitud, error: solicitudError } = await supabase
         .from('surgery_requests')
@@ -331,6 +333,7 @@ export default function CrearPaciente() {
         nombre: '',
         apellido: '',
         rut: '',
+        telefono: '',
         codigo_operacion: '',
         hora_recomendada: '',
         hora_fin_recomendada: '',
@@ -340,7 +343,7 @@ export default function CrearPaciente() {
         hora_fin_recomendada_2: '',
         fecha_preferida_2: '',
         operating_room_id_preferido_2: '',
-        dejar_fecha_a_pabellon: false,
+        dejar_fecha_a_pabellon: true,
         horarios_extra: [],
         observaciones: '',
         insumos: [],
@@ -430,10 +433,10 @@ export default function CrearPaciente() {
     showSuccess(`Insumo "${insumo.nombre}" agregado correctamente`)
   }
 
-  const eliminarInsumo = (index) => {
+  const eliminarInsumo = (supplyId) => {
     setFormData({
       ...formData,
-      insumos: formData.insumos.filter((_, i) => i !== index),
+      insumos: formData.insumos.filter((ins) => ins.supply_id !== supplyId),
     })
   }
 
@@ -810,12 +813,18 @@ export default function CrearPaciente() {
                   type="button"
                   onClick={() => {
                     setSlot1Seleccionado(null)
+                    setSlot2Seleccionado(null)
+                    setShowSegundoHorario(false)
                     setFormData(prev => ({
                       ...prev,
                       fecha_preferida: '',
                       hora_recomendada: '',
                       hora_fin_recomendada: '',
                       operating_room_id_preferido: '',
+                      fecha_preferida_2: '',
+                      hora_recomendada_2: '',
+                      hora_fin_recomendada_2: '',
+                      operating_room_id_preferido_2: '',
                     }))
                   }}
                   className={`ml-auto text-sm font-medium underline ${theme === 'dark' ? 'text-slate-400 hover:text-slate-200' : 'text-gray-600 hover:text-gray-800'}`}
@@ -872,7 +881,7 @@ export default function CrearPaciente() {
 
               {/* Horarios extra (3º, 4º, ...) */}
               {formData.horarios_extra.map((extra, idx) => (
-                <div key={idx} className="space-y-2">
+                <div key={extra._key} className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-gray-800'}`}>
                       {idx + 3}º horario
@@ -958,7 +967,7 @@ export default function CrearPaciente() {
                 type="button"
                 onClick={() => setFormData(prev => ({
                   ...prev,
-                  horarios_extra: [...prev.horarios_extra, { fecha_preferida: '', operating_room_id: '', hora_recomendada: '', hora_fin_recomendada: '' }],
+                  horarios_extra: [...prev.horarios_extra, { _key: Date.now(), fecha_preferida: '', operating_room_id: '', hora_recomendada: '', hora_fin_recomendada: '' }],
                 }))}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border ${theme === 'dark' ? 'bg-slate-800 border-slate-600 text-slate-200 hover:bg-slate-700' : 'bg-white border-slate-300 text-gray-700 hover:bg-slate-100'}`}
               >
@@ -1028,9 +1037,9 @@ export default function CrearPaciente() {
               <div className={`border rounded-lg p-4 space-y-2 ${
                 theme === 'dark' ? 'border-slate-600 bg-slate-800/50' : 'border-slate-200'
               }`}>
-                {formData.insumos.map((insumo, index) => (
+                {formData.insumos.map((insumo) => (
                   <div
-                    key={index}
+                    key={insumo.supply_id}
                     className={`flex justify-between items-center p-3 rounded-lg ${
                       theme === 'dark'
                         ? 'bg-slate-700 text-slate-100'
@@ -1042,7 +1051,7 @@ export default function CrearPaciente() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => eliminarInsumo(index)}
+                      onClick={() => eliminarInsumo(insumo.supply_id)}
                       className={theme === 'dark'
                         ? 'text-red-400 hover:text-red-300 font-semibold'
                         : 'text-red-600 hover:text-red-800 font-semibold'

@@ -128,7 +128,7 @@ const MonthView = ({ anio, monthIndex, onWeekClick }) => {
                 </div>
                 <div className="text-left">
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">
-                    Semana 0{weekNum}
+                    Semana {weekNum}
                   </h3>
                   <p className="text-xs font-medium text-slate-400 mt-1 uppercase tracking-wider">
                     Del {format(weekStart, 'd', { locale: es })} al {format(weekEnd, 'd', { locale: es })} de {MESES[monthIndex].nombre}
@@ -334,7 +334,7 @@ const DayView = ({ day, pabellones, cirugias, onCancelarClick }) => {
 
       {/* Grid Principal */}
       <div className="flex-1 bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm overflow-hidden relative">
-        <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr] gap-4 mb-4">
+        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: `3rem repeat(${pabellones.length}, 1fr)` }}>
           <div className="w-12" /> {/* Espaciador hora */}
           {pabellones.map(p => (
             <div key={p.id} className="text-center">
@@ -348,7 +348,7 @@ const DayView = ({ day, pabellones, cirugias, onCancelarClick }) => {
 
         <div className="space-y-4">
           {slots.map(time => (
-            <div key={time} className="grid grid-cols-[auto_1fr_1fr_1fr_1fr] gap-4 items-center group">
+            <div key={time} className="grid gap-4 items-center group" style={{ gridTemplateColumns: `3rem repeat(${pabellones.length}, 1fr)` }}>
               <span className="w-12 text-[10px] font-bold text-slate-400 text-right">{time}</span>
               {pabellones.map(p => {
                 const { status, data } = getSlotStatus(p.id, time)

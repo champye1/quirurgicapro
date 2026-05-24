@@ -24,7 +24,7 @@ export default function Auditoria() {
   const debouncedBusqueda = useDebounce(busqueda, 300)
   const { theme } = useTheme()
 
-  const { data: logs = [], isLoading } = useQuery({
+  const { data: logs = [], isLoading, isError } = useQuery({
     queryKey: ['audit-logs', filtroTabla, filtroAccion, fechaDesde, fechaHasta],
     queryFn: async () => {
       let query = supabase
@@ -263,6 +263,10 @@ export default function Auditoria() {
         {isLoading ? (
           <div className="text-center py-8">
             <LoadingSpinner />
+          </div>
+        ) : isError ? (
+          <div className={`text-center py-8 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
+            Error al cargar los registros de auditoría. Verifica tu conexión e intenta de nuevo.
           </div>
         ) : logsFiltrados.length === 0 ? (
           <div className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-500'}`}>

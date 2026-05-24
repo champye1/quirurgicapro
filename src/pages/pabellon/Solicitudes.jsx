@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { CheckCircle2, Clock, Eye, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Lock, Search } from 'lucide-react'
+import { CheckCircle2, Clock, Eye, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Lock, Search, XCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { codigosOperaciones } from '../../data/codigosOperaciones'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -53,6 +53,7 @@ export default function Solicitudes() {
         
         // Limpiar sessionStorage
         sessionStorage.removeItem('slot_seleccionado')
+        sessionStorage.removeItem('solicitud_gestionando')
       }
     } catch (e) {
       logger.errorWithContext('Error al procesar slot seleccionado', e)
@@ -196,6 +197,7 @@ export default function Solicitudes() {
     },
     onSuccess: (solicitud) => {
       queryClient.invalidateQueries(['solicitudes'])
+      queryClient.invalidateQueries(['solicitudes-pendientes'])
       showSuccess('Solicitud rechazada')
       setShowConfirmRechazar(false)
       setSolicitudARechazar(null)
@@ -358,6 +360,7 @@ export default function Solicitudes() {
       queryClient.invalidateQueries(['solicitudes-pendientes'])
       queryClient.invalidateQueries(['cirugias-hoy'])
       queryClient.invalidateQueries(['cirugias-calendario'])
+      queryClient.invalidateQueries(['cirugias-fecha'])
       if (solicitudProgramando) {
         enviarWhatsApp({ ...solicitudProgramando, hora_recomendada: variables.formData?.fecha ? `${variables.formData.fecha}T${variables.formData.hora_inicio}` : solicitudProgramando.hora_recomendada }, 'aceptada')
       }
@@ -1043,6 +1046,14 @@ export default function Solicitudes() {
                         >
                           GESTIONAR CUPO
                         </button>
+                        <button
+                          onClick={() => { setSolicitudARechazar(solicitud); setShowConfirmRechazar(true) }}
+                          className="bg-red-600 hover:bg-red-700 text-white p-2.5 sm:p-3 rounded-lg sm:rounded-xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                          title="Rechazar solicitud"
+                          aria-label="Rechazar solicitud"
+                        >
+                          <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
                       </>
                     )}
                   </div>
@@ -1580,11 +1591,10 @@ export default function Solicitudes() {
                           onClick={() => {
                             const pabellon = pabellonesMostrar.find(p => p.id === formProgramacion.operating_room_id)
                             if (pabellon && formProgramacion.hora_inicio) {
-                              // Calcular hora fin (asumiendo 1 hora por defecto)
+                              // Calcular hora fin (asumiendo 1 hora por defecto, máx 19:00 exacto)
                               const [hours, minutes] = formProgramacion.hora_inicio.split(':')
-                              const horaFin = new Date()
-                              horaFin.setHours(parseInt(hours) + 1, parseInt(minutes))
-                              const horaFinStr = `${horaFin.getHours().toString().padStart(2, '0')}:${horaFin.getMinutes().toString().padStart(2, '0')}`
+                              const finMinutos = Math.min(parseInt(hours) * 60 + parseInt(minutes) + 60, 19 * 60)
+                              const horaFinStr = `${Math.floor(finMinutos / 60).toString().padStart(2, '0')}:${(finMinutos % 60).toString().padStart(2, '0')}`
                               
                               setFormProgramacion(prev => ({
                                 ...prev,

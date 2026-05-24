@@ -274,7 +274,12 @@ export default function Correos() {
   const handleAbrirMensaje = (m) => {
     setMensajeAbierto(m)
     setNotasEditando(m.notas_internas || '')
-    if (!m.leido) marcarLeido.mutate(m.id)
+    if (!m.leido) {
+      // Cambiar a "Todos" antes de marcar como leído para que el mensaje
+      // no desaparezca de la vista mientras el usuario lo está leyendo
+      if (filtro === 'no_leidos') setFiltro('todos')
+      marcarLeido.mutate(m.id)
+    }
   }
 
   const urlContacto = `${window.location.origin}/contacto`
@@ -400,8 +405,8 @@ export default function Correos() {
       ) : mensajesFiltrados.length === 0 ? (
         <EmptyState
           icon={Mail}
-          title={filtro === 'no_leidos' ? 'No hay mensajes sin leer' : 'No hay mensajes'}
-          description={filtro === 'no_leidos' ? 'Todos los correos han sido revisados' : 'La bandeja está vacía'}
+          title={busqueda.trim() ? 'Sin resultados' : filtro === 'no_leidos' ? 'No hay mensajes sin leer' : 'No hay mensajes'}
+          description={busqueda.trim() ? `No hay mensajes que coincidan con "${busqueda}"` : filtro === 'no_leidos' ? 'Todos los correos han sido revisados' : 'La bandeja está vacía'}
         />
       ) : (
         <div className="space-y-3">
@@ -564,17 +569,28 @@ export default function Correos() {
 
                     {/* Acciones */}
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <a
-                        href={`mailto:${m.email_remitente}?subject=Re: ${encodeURIComponent(m.asunto)}`}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <Mail className="w-3.5 h-3.5" /> Responder por email
-                      </a>
+                      {m.email_remitente ? (
+                        <a
+                          href={`mailto:${m.email_remitente}?subject=Re: ${encodeURIComponent(m.asunto)}`}
+                          className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <Mail className="w-3.5 h-3.5" /> Responder por email
+                        </a>
+                      ) : (
+                        <span
+                          className="flex items-center gap-1.5 px-3 py-2 bg-gray-200 text-gray-400 text-xs font-bold rounded-xl cursor-not-allowed"
+                          title="El mensaje no tiene dirección de email"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <Mail className="w-3.5 h-3.5" /> Sin email
+                        </span>
+                      )}
                       <button
                         type="button"
+                        disabled={archivar.isPending}
                         onClick={e => { e.stopPropagation(); archivar.mutate({ id: m.id, archivar: !m.archivado }) }}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-colors ${
+                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           isDark ? 'border-slate-600 text-slate-300 hover:bg-slate-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
@@ -583,6 +599,7 @@ export default function Correos() {
                       </button>
                       <button
                         type="button"
+                        disabled={eliminar.isPending}
                         onClick={e => {
                           e.stopPropagation()
                           if (window.confirm('¿Eliminar este mensaje? Esta acción no se puede deshacer.')) {
@@ -590,7 +607,7 @@ export default function Correos() {
                             setExpandedId(null)
                           }
                         }}
-                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Eliminar
                       </button>

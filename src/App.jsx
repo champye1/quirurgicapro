@@ -117,6 +117,7 @@ function AppContent() {
       
       if (data) {
         setUserRole(data.role)
+        sessionStorage.removeItem('validating_login')
       } else {
         setUserRole(null)
       }

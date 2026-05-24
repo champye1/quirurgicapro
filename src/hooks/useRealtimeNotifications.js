@@ -29,7 +29,7 @@ export function useRealtimeNotifications(userId) {
         (payload) => {
           logger.debug('Nueva notificación recibida:', payload.new)
           queryClient.invalidateQueries(['notifications'])
-          showInfo(`Nueva notificación: ${payload.new.titulo}`)
+          showInfo(`Nueva notificación: ${payload.new?.titulo ?? 'Sin título'}`)
         }
       )
       .subscribe()
@@ -49,13 +49,8 @@ export function useRealtimeNotifications(userId) {
           queryClient.invalidateQueries(['solicitudes'])
           queryClient.invalidateQueries(['solicitudes-doctor'])
           queryClient.invalidateQueries(['solicitudes-pendientes'])
-          
-          // Notificar cambios de estado importantes
-          if (payload.new?.estado === 'aceptada' && payload.old?.estado === 'pendiente') {
-            showSuccess('Tu solicitud ha sido aceptada')
-          } else if (payload.new?.estado === 'rechazada' && payload.old?.estado === 'pendiente') {
-            showInfo('Tu solicitud ha sido rechazada')
-          }
+          // Los toasts de aceptada/rechazada los maneja el canal 'notifications'
+          // (que filtra por user_id) para evitar notificar a todos los doctores.
         }
       )
       .subscribe()

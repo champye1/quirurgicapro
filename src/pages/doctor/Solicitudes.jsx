@@ -60,6 +60,7 @@ export default function Solicitudes() {
           *,
           patients:patient_id(nombre, apellido, rut),
           surgery_request_supplies(
+            supply_id,
             cantidad,
             supplies:supply_id(nombre, codigo)
           ),
@@ -183,6 +184,8 @@ export default function Solicitudes() {
         observaciones: '',
         insumos: [],
       })
+      setInsumoSeleccionado('')
+      setCantidadInsumo(1)
     },
     onError: (error) => {
       const errorMessage = error.message || error.toString() || 'Error desconocido'
@@ -345,6 +348,7 @@ export default function Solicitudes() {
           <option value="pendiente">Pendientes</option>
           <option value="aceptada">Aceptadas</option>
           <option value="rechazada">Rechazadas</option>
+          <option value="cancelada">Canceladas</option>
         </select>
       </div>
 
@@ -551,9 +555,13 @@ export default function Solicitudes() {
           setFormEdicion({
             codigo_operacion: '',
             hora_recomendada: '',
+            hora_fin_recomendada: '',
+            fecha_preferida: '',
             observaciones: '',
             insumos: [],
           })
+          setInsumoSeleccionado('')
+          setCantidadInsumo(1)
         }}
         title="Editar Solicitud"
       >
@@ -576,19 +584,43 @@ export default function Solicitudes() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label-field">Hora Inicio Recomendada</label>
+                <select
+                  value={formEdicion.hora_recomendada ? String(formEdicion.hora_recomendada).slice(0, 5) : ''}
+                  onChange={(e) => setFormEdicion({ ...formEdicion, hora_recomendada: e.target.value })}
+                  className="input-field"
+                >
+                  <option value="">Sin preferencia</option>
+                  {HORAS_SELECT.map(h => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label-field">Hora Fin Recomendada</label>
+                <select
+                  value={formEdicion.hora_fin_recomendada ? String(formEdicion.hora_fin_recomendada).slice(0, 5) : ''}
+                  onChange={(e) => setFormEdicion({ ...formEdicion, hora_fin_recomendada: e.target.value })}
+                  className="input-field"
+                >
+                  <option value="">Sin preferencia</option>
+                  {HORAS_SELECT.filter(h => !formEdicion.hora_recomendada || h > formEdicion.hora_recomendada).map(h => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div>
-              <label className="label-field">Hora Recomendada (Opcional)</label>
-              <select
-                value={formEdicion.hora_recomendada ? String(formEdicion.hora_recomendada).slice(0, 5) : ''}
-                onChange={(e) => setFormEdicion({ ...formEdicion, hora_recomendada: e.target.value })}
+              <label className="label-field">Fecha Preferida</label>
+              <input
+                type="date"
+                value={formEdicion.fecha_preferida || ''}
+                onChange={(e) => setFormEdicion({ ...formEdicion, fecha_preferida: e.target.value })}
                 className="input-field"
-              >
-                <option value="">Sin preferencia</option>
-                {HORAS_SELECT.map(h => (
-                  <option key={h} value={h}>{h}</option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-0.5">Solo hora (sin minutos)</p>
+              />
             </div>
 
             <div>
@@ -668,9 +700,13 @@ export default function Solicitudes() {
                   setFormEdicion({
                     codigo_operacion: '',
                     hora_recomendada: '',
+                    hora_fin_recomendada: '',
+                    fecha_preferida: '',
                     observaciones: '',
                     insumos: [],
                   })
+                  setInsumoSeleccionado('')
+                  setCantidadInsumo(1)
                 }}
               >
                 Cancelar

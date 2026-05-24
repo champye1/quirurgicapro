@@ -60,11 +60,18 @@ serve(async (req) => {
       })
     }
 
-    const body = await req.json()
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return new Response(JSON.stringify({ error: 'Body JSON inválido.' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
     const { to, tipo, destinatario, nombrePaciente, nombreDoctor, fechaCirugia, observaciones } = body
 
-    if (!to) {
-      return new Response(JSON.stringify({ error: 'Falta el número de teléfono destino.' }), {
+    if (!to || typeof to !== 'string') {
+      return new Response(JSON.stringify({ error: 'Falta el número de teléfono destino (string).' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

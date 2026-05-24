@@ -67,17 +67,6 @@ export function sanitizeString(input, options = {}) {
     })
   }
 
-  // Escapar caracteres especiales HTML si no se permite HTML
-  if (!allowHTML) {
-    sanitized = sanitized
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;')
-  }
-
   // Limitar longitud si se especifica
   if (maxLength && sanitized.length > maxLength) {
     sanitized = sanitized.substring(0, maxLength)

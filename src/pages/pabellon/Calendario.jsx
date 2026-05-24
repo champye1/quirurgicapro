@@ -198,7 +198,7 @@ const MonthView = ({ anio, monthIndex, onWeekClick }) => {
                     <h3 className={`text-sm sm:text-base font-black uppercase tracking-wide leading-relaxed truncate ${
                       esSemanaPasada ? 'text-slate-500' : 'text-slate-900'
                     }`}>
-                      Semana 0{weekNum}
+                      Semana {weekNum}
                     </h3>
                     {esSemanaPasada && (
                       <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-200 text-slate-600">
@@ -369,7 +369,8 @@ const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSl
   const [isResizing, setIsResizing] = useState(false)
   const gridRef = useRef(null)
   const resizeHandleRef = useRef(null)
-  
+  const resizeCleanupRef = useRef(null)
+
   // Verificar si el día es pasado
   const esDiaPasado = isPast(startOfDay(day)) && !isSameDay(day, new Date())
 
@@ -379,6 +380,11 @@ const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSl
       setCurrentTime(new Date())
     }, 60000)
     return () => clearInterval(interval)
+  }, [])
+
+  // Cleanup drag listeners si el componente se desmonta durante un resize
+  useEffect(() => {
+    return () => { resizeCleanupRef.current?.() }
   }, [])
 
   // Scroll automático a la hora actual al cargar
@@ -616,8 +622,10 @@ const DayView = ({ day, pabellones, cirugias, bloqueos, onSlotSelect, selectedSl
               document.body.style.userSelect = ''
               document.body.style.cursor = ''
               setIsResizing(false)
+              resizeCleanupRef.current = null
             }
-            
+
+            resizeCleanupRef.current = handleUp
             document.addEventListener('mousemove', handleMove)
             document.addEventListener('mouseup', handleUp)
           }}
@@ -1005,9 +1013,10 @@ export default function Calendario() {
         setCirugiaAReagendar(cirugia)
         setCurrentRequest(solicitud)
         setView('day')
-        setSelectedDay(new Date(cirugia.fecha))
-        setSelectedMonth(new Date(cirugia.fecha).getMonth())
-        setAnio(new Date(cirugia.fecha).getFullYear())
+        const fechaLocal = new Date(cirugia.fecha + 'T00:00:00')
+        setSelectedDay(fechaLocal)
+        setSelectedMonth(fechaLocal.getMonth())
+        setAnio(fechaLocal.getFullYear())
       } catch (e) {
         logger.errorWithContext('Error en loadReagendar', e)
         showError('Error al cargar datos para reagendar.')

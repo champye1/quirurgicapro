@@ -200,7 +200,7 @@ export default function Dashboard() {
         .select('hora_inicio, hora_fin')
         .gte('fecha', fechaInicio)
         .is('deleted_at', null)
-        .in('estado', ['completada'])
+        .in('estado', ['programada', 'en_proceso', 'completada'])
       
       if (error) throw error
       if (!cirugias || cirugias.length === 0) return 0

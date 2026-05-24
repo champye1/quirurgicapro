@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { Plus, Edit, Trash2, Search, Download, FileSpreadsheet } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, Download, FileSpreadsheet, AlertTriangle, Package } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
 import { useDebounce } from '../../hooks/useDebounce'
 import { exportToCSV, exportToExcel } from '../../utils/exportData'
 import { sanitizeString, sanitizeCode } from '../../utils/sanitizeInput'
 import Pagination from '../../components/common/Pagination'
 import ConfirmModal from '../../components/common/ConfirmModal'
+import Modal from '../../components/common/Modal'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 import { useTheme } from '../../contexts/ThemeContext'
 
@@ -22,9 +23,13 @@ export default function Insumos() {
     grupo_prestacion: '',
     proveedor: '',
     grupos_fonasa: '',
+    stock_minimo: 10,
   })
   const [showConfirmEliminar, setShowConfirmEliminar] = useState(false)
   const [insumoAEliminar, setInsumoAEliminar] = useState(null)
+  const [showStockModal, setShowStockModal] = useState(false)
+  const [insumoStock, setInsumoStock] = useState(null)
+  const [stockForm, setStockForm] = useState({ tipo: 'entrada', cantidad: 1, motivo: '' })
   const [codigoError, setCodigoError] = useState('')
   const [codigoTouched, setCodigoTouched] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -181,6 +186,30 @@ export default function Insumos() {
     },
   })
 
+  const registrarMovimiento = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error } = await supabase
+        .from('supply_movements')
+        .insert({
+          supply_id: insumoStock.id,
+          tipo: stockForm.tipo,
+          cantidad: parseInt(stockForm.cantidad),
+          motivo: stockForm.motivo || null,
+          created_by: user.id,
+        })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['insumos'])
+      showSuccess('Stock actualizado')
+      setShowStockModal(false)
+    },
+    onError: () => {
+      showError('Error al registrar movimiento')
+    },
+  })
+
   // Validar solo que el código no esté duplicado (código libre por clínica)
   const validarCodigo = async (codigo) => {
     if (!codigo || codigo.trim() === '') {
@@ -236,19 +265,20 @@ export default function Insumos() {
       return
     }
     
-    const payload = {
-      ...formData,
+    const basePayload = {
+      nombre: formData.nombre,
       codigo: codigoTrim,
+      grupo_prestacion: formData.grupo_prestacion,
       proveedor: (formData.proveedor || '').trim() || null,
       grupos_fonasa: (formData.grupos_fonasa || '').trim() || null,
-      stock_actual: 0,
-      stock_minimo: 0,
+      stock_minimo: parseInt(formData.stock_minimo) || 10,
       unidad_medida: 'unidad',
     }
     if (insumoEditando) {
-      actualizarInsumo.mutate({ id: insumoEditando.id, data: payload })
+      // No incluir stock_actual al editar: es gestionado por supply_movements
+      actualizarInsumo.mutate({ id: insumoEditando.id, data: basePayload })
     } else {
-      crearInsumo.mutate(payload)
+      crearInsumo.mutate({ ...basePayload, stock_actual: 0 })
     }
   }
 
@@ -272,6 +302,7 @@ export default function Insumos() {
       grupo_prestacion: insumo.grupo_prestacion,
       proveedor: insumo.proveedor ?? '',
       grupos_fonasa: insumo.grupos_fonasa ?? '',
+      stock_minimo: insumo.stock_minimo ?? 10,
     })
     setCodigoError('')
     setCodigoTouched(false)
@@ -311,12 +342,13 @@ export default function Insumos() {
             onClick={() => {
               setMostrarFormulario(true)
               setInsumoEditando(null)
-              setFormData({ 
-                nombre: '', 
-                codigo: '', 
+              setFormData({
+                nombre: '',
+                codigo: '',
                 grupo_prestacion: '',
                 proveedor: '',
                 grupos_fonasa: '',
+                stock_minimo: 10,
               })
               setCodigoError('')
               setCodigoTouched(false)
@@ -438,9 +470,24 @@ export default function Insumos() {
               </p>
             </div>
 
+            <div>
+              <label className="label-field">Stock mínimo (alerta de reposición)</label>
+              <input
+                type="number"
+                min="0"
+                value={formData.stock_minimo}
+                onChange={(e) => setFormData({ ...formData, stock_minimo: e.target.value })}
+                className="input-field w-32"
+                placeholder="10"
+              />
+              <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-500'}`}>
+                Cantidad mínima antes de alertar por reposición.
+              </p>
+            </div>
+
             <div className="flex gap-2">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-primary"
                 disabled={crearInsumo.isPending || actualizarInsumo.isPending}
               >
@@ -479,17 +526,19 @@ export default function Insumos() {
                 <th className={`text-left py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>Grupo Prestación</th>
                 <th className={`text-left py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>Proveedor</th>
                 <th className={`text-left py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`} title="Grupos de prestación FONASA para los que aplica este insumo (ej. 18=general, 11=ortopedia). Vacío = todas las cirugías.">Grupos Fonasa</th>
+                <th className={`text-right py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>Stock</th>
+                <th className={`text-right py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>Mín.</th>
                 <th className={`text-left py-3 px-4 font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="6" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>Cargando...</td>
+                  <td colSpan="8" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>Cargando...</td>
                 </tr>
               ) : insumos.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-500'}`}>
+                  <td colSpan="8" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-500'}`}>
                     No se encontraron insumos
                   </td>
                 </tr>
@@ -510,6 +559,21 @@ export default function Insumos() {
                       <td className={`py-3 px-4 font-mono text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`} title={insumo.grupos_fonasa ? `Cirugías grupo(s): ${insumo.grupos_fonasa}` : 'Todas las cirugías'}>
                         {insumo.grupos_fonasa || '—'}
                       </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className={`font-bold text-sm inline-flex items-center gap-1 ${
+                          insumo.stock_actual <= insumo.stock_minimo
+                            ? 'text-red-600'
+                            : theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {insumo.stock_actual <= insumo.stock_minimo && (
+                            <AlertTriangle className="w-3.5 h-3.5" title="Stock bajo mínimo" />
+                          )}
+                          {insumo.stock_actual ?? 0}
+                        </span>
+                      </td>
+                      <td className={`py-3 px-4 text-right text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-gray-500'}`}>
+                        {insumo.stock_minimo ?? 0}
+                      </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
                           <button
@@ -519,6 +583,18 @@ export default function Insumos() {
                             title="Editar insumo"
                           >
                             <Edit className="w-5 h-5" aria-hidden="true" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setInsumoStock(insumo)
+                              setStockForm({ tipo: 'entrada', cantidad: 1, motivo: '' })
+                              setShowStockModal(true)
+                            }}
+                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded"
+                            aria-label="Ajustar stock"
+                            title="Ajustar stock"
+                          >
+                            <Package className="w-5 h-5" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => handleEliminar(insumo)}
@@ -567,6 +643,82 @@ export default function Insumos() {
         cancelText="Cancelar"
         variant="danger"
       />
+
+      {/* Modal Ajuste de Stock */}
+      <Modal
+        isOpen={showStockModal}
+        onClose={() => setShowStockModal(false)}
+        title={`Ajustar Stock — ${insumoStock?.nombre}`}
+      >
+        <div className="space-y-4">
+          <p className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>
+            Stock actual:{' '}
+            <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {insumoStock?.stock_actual ?? 0} unidades
+            </span>
+          </p>
+
+          <div>
+            <label className="label-field">Tipo de movimiento *</label>
+            <select
+              value={stockForm.tipo}
+              onChange={(e) => setStockForm({ ...stockForm, tipo: e.target.value })}
+              className="input-field"
+            >
+              <option value="entrada">Entrada</option>
+              <option value="salida">Salida</option>
+              <option value="ajuste">Ajuste</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="label-field">Cantidad *</label>
+            <input
+              type="number"
+              min="1"
+              value={stockForm.cantidad}
+              onChange={(e) => setStockForm({ ...stockForm, cantidad: e.target.value })}
+              className="input-field w-32"
+            />
+          </div>
+
+          <div>
+            <label className="label-field">Motivo (opcional)</label>
+            <input
+              type="text"
+              value={stockForm.motivo}
+              onChange={(e) => setStockForm({ ...stockForm, motivo: e.target.value })}
+              className="input-field"
+              placeholder="Ej: Compra #1234, Devolución..."
+            />
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={() => registrarMovimiento.mutate()}
+              className="btn-primary"
+              disabled={registrarMovimiento.isPending || !stockForm.cantidad || parseInt(stockForm.cantidad) < 1}
+            >
+              {registrarMovimiento.isPending ? (
+                <span className="flex items-center gap-2">
+                  <LoadingSpinner size="sm" />
+                  Guardando...
+                </span>
+              ) : (
+                'Guardar'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowStockModal(false)}
+              className="btn-secondary"
+              disabled={registrarMovimiento.isPending}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
