@@ -24,6 +24,9 @@ export const lucideIcons = {
   Zap: Stub, Star: Stub, Heart: Stub, Globe: Stub, Shield: Stub,
   Log: Stub, LogOut: Stub, LogIn: Stub, Menu: Stub, Moon: Stub,
   Sun: Stub, Monitor: Stub, RefreshCw: Stub, RotateCw: Stub,
-  ExternalLink: Stub, Link: Stub, Copy: Stub, Check: Stub,
+  ExternalLink: Stub, Link: Stub, Link2: Stub, Copy: Stub, Check: Stub,
   FileSearch: Stub, FolderOpen: Stub, Folder: Stub,
+  StickyNote: Stub, Database: Stub, FileSpreadsheet: Stub,
+  Palmtree: Stub, UserCheck: Stub, Key: Stub, MailOpen: Stub,
+  Archive: Stub, PhoneCall: Stub, MessageSquare: Stub,
 }
