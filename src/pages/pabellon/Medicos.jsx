@@ -13,6 +13,7 @@ import { exportToCSV, exportToExcel } from '../../utils/exportData'
 import Pagination from '../../components/common/Pagination'
 import ConfirmModal from '../../components/common/ConfirmModal'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { TableBodySkeleton } from '../../components/common/Skeleton'
 import { useTheme } from '../../contexts/ThemeContext'
 
 const ESPECIALIDADES = [
@@ -1043,9 +1044,7 @@ export default function Medicos() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan="7" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>Cargando...</td>
-                </tr>
+                <TableBodySkeleton rows={6} cols={7} />
               ) : medicosFiltrados.length === 0 ? (
                 <tr>
                   <td colSpan="7" className={`text-center py-8 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-500'}`}>

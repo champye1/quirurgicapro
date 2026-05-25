@@ -35,4 +35,17 @@ export function TableSkeleton({ rows = 5 }) {
   )
 }
 
+/** Use inside a <tbody> when the real table is already rendered. */
+export function TableBodySkeleton({ rows = 5, cols = 4 }) {
+  return Array.from({ length: rows }).map((_, i) => (
+    <tr key={i}>
+      {Array.from({ length: cols }).map((__, j) => (
+        <td key={j} className="py-3 px-4">
+          <SkeletonLoader height={16} width={j === 0 ? '60%' : '80%'} />
+        </td>
+      ))}
+    </tr>
+  ))
+}
+
 export default CardSkeleton

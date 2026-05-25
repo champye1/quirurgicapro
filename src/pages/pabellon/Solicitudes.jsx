@@ -695,10 +695,6 @@ export default function Solicitudes() {
     return estados[estado] || estados.pendiente
   }
 
-  if (isLoading) {
-    return <div className="text-center py-8">Cargando solicitudes...</div>
-  }
-
   // Función para obtener el color del círculo según la prioridad o estado
   const getPriorityColor = (solicitud) => {
     // Si hay campo prioridad, usarlo

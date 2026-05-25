@@ -9,7 +9,7 @@ import { sanitizeString } from '../../utils/sanitizeInput'
 import { logger } from '../../utils/logger'
 import { exportToCSV, exportToExcel } from '../../utils/exportData'
 import Pagination from '../../components/common/Pagination'
-import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { TableSkeleton } from '../../components/common/Skeleton'
 import { useTheme } from '../../contexts/ThemeContext'
 
 export default function Auditoria() {
@@ -261,9 +261,7 @@ export default function Auditoria() {
       {/* Lista de logs */}
       <div className="card">
         {isLoading ? (
-          <div className="text-center py-8">
-            <LoadingSpinner />
-          </div>
+          <TableSkeleton rows={6} />
         ) : isError ? (
           <div className={`text-center py-8 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
             Error al cargar los registros de auditoría. Verifica tu conexión e intenta de nuevo.
