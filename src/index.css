@@ -141,3 +141,75 @@
     display: none;  /* Chrome, Safari y Opera */
   }
 }
+
+/* ── Print styles ── */
+@media print {
+  /* Ocultar elementos de navegación */
+  nav, aside, header, footer,
+  [class*="sidebar"], [class*="topbar"],
+  button:not(.print-visible),
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ocupar todo el ancho de la página */
+  main, .main-content, #root > * {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Forzar fondo blanco y texto negro */
+  body, * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+
+  /* Tarjetas sin bordes redondeados exagerados */
+  .card, [class*="rounded"] {
+    border-radius: 4px !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Tablas: siempre mostrar bordes */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* Evitar cortes de página en medio de filas */
+  tr, .card {
+    break-inside: avoid;
+  }
+
+  /* Forzar salto de página antes de secciones principales */
+  h1 {
+    break-before: page;
+    font-size: 16px !important;
+  }
+
+  h1:first-child {
+    break-before: auto;
+  }
+
+  h2 { font-size: 14px !important; }
+  h3 { font-size: 12px !important; }
+
+  /* Mostrar URLs de enlaces */
+  a[href]::after {
+    content: none;
+  }
+
+  /* Márgenes de página */
+  @page {
+    margin: 15mm;
+    size: A4;
+  }
+}

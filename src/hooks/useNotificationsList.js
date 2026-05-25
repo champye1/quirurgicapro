@@ -36,9 +36,25 @@ export function useNotificationsList(userId, options = {}) {
         .eq('user_id', userId)
       if (error) throw error
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['notifications', userId])
-      queryClient.invalidateQueries(['unread-notifications-count', userId])
+    onMutate: async (notificationId) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userId] })
+      const previous = queryClient.getQueryData(['notifications', userId])
+      queryClient.setQueryData(['notifications', userId], (old) =>
+        (old ?? []).map(n => n.id === notificationId ? { ...n, vista: true } : n)
+      )
+      queryClient.setQueryData(['unread-notifications-count', userId], (old) =>
+        Math.max(0, (old ?? 1) - 1)
+      )
+      return { previous }
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications', userId], context.previous)
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userId] })
+      queryClient.invalidateQueries({ queryKey: ['unread-notifications-count', userId] })
     },
   })
 
@@ -51,9 +67,23 @@ export function useNotificationsList(userId, options = {}) {
         .eq('vista', false)
       if (error) throw error
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['notifications', userId])
-      queryClient.invalidateQueries(['unread-notifications-count', userId])
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', userId] })
+      const previous = queryClient.getQueryData(['notifications', userId])
+      queryClient.setQueryData(['notifications', userId], (old) =>
+        (old ?? []).map(n => ({ ...n, vista: true }))
+      )
+      queryClient.setQueryData(['unread-notifications-count', userId], 0)
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications', userId], context.previous)
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userId] })
+      queryClient.invalidateQueries({ queryKey: ['unread-notifications-count', userId] })
     },
   })
 

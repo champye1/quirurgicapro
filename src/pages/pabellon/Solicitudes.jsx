@@ -195,21 +195,36 @@ export default function Solicitudes() {
       if (error) throw error
       return solicitud
     },
+    onMutate: async (solicitud) => {
+      await queryClient.cancelQueries({ queryKey: ['solicitudes'] })
+      const previousData = queryClient.getQueriesData({ queryKey: ['solicitudes'] })
+      queryClient.setQueriesData({ queryKey: ['solicitudes'] }, (old) =>
+        (old ?? []).map(s => s.id === solicitud.id ? { ...s, estado: 'rechazada' } : s)
+      )
+      return { previousData }
+    },
     onSuccess: (solicitud) => {
-      queryClient.invalidateQueries(['solicitudes'])
-      queryClient.invalidateQueries(['solicitudes-pendientes'])
       showSuccess('Solicitud rechazada')
       setShowConfirmRechazar(false)
       setSolicitudARechazar(null)
       enviarWhatsApp(solicitud, 'rechazada')
     },
-    onError: (error) => {
+    onError: (error, _solicitud, context) => {
+      if (context?.previousData) {
+        context.previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
       const errorMessage = error.message || error.toString() || 'Error desconocido'
       if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
         showError('Error de conexión. Verifique su conexión a internet e intente nuevamente.')
       } else {
         showError('Error al rechazar la solicitud: ' + errorMessage)
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['solicitudes'] })
+      queryClient.invalidateQueries({ queryKey: ['solicitudes-pendientes'] })
     },
   })
 

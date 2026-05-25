@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# Sistema clínico privado — no indexar ninguna ruta

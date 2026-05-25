@@ -8,6 +8,7 @@ import {
   Menu, X, Bell, Stethoscope, Sun, Moon, Activity,
 } from 'lucide-react'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { LayoutErrorBoundary } from '../components/common/ErrorBoundary'
 import Modal from '../components/common/Modal'
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications'
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications'
@@ -325,9 +326,11 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
 
         {/* Page Content */}
         <main className={`flex-1 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10 ${mainBg} min-h-full`}>
-          <Suspense fallback={<LoadingSpinner />}>
-            {children}
-          </Suspense>
+          <LayoutErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              {children}
+            </Suspense>
+          </LayoutErrorBoundary>
         </main>
       </div>
 
