@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { LayoutErrorBoundary } from '../components/common/ErrorBoundary'
+import OfflineBanner from '../components/common/OfflineBanner'
 import Modal from '../components/common/Modal'
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications'
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications'
@@ -137,6 +138,8 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
 
   return (
     <div className={`min-h-screen font-sans antialiased flex overflow-hidden transition-colors duration-150 ${isDark ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-900'}`}>
+
+      <OfflineBanner />
 
       {/* Mobile overlay */}
       {isMobileMenuOpen && (

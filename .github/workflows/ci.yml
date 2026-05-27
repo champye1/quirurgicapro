@@ -24,6 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security audit
+        # Fails on critical vulnerabilities. xlsx has an unresolved 'high'
+        # advisory with no fix available — tracked and accepted separately.
+        run: npm audit --audit-level=critical
+
       - name: Lint
         run: npm run lint
 
