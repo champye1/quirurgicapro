@@ -108,7 +108,7 @@ export default function Insumos() {
     })
     const startIndex = (currentPage - 1) * itemsPerPage
     return sorted.slice(startIndex, startIndex + itemsPerPage)
-  }, [insumos, currentPage, itemsPerPage, sortField, sortDir])
+  }, [insumosFiltrados, currentPage, itemsPerPage, sortField, sortDir])
 
   const handleSort = (field) => {
     if (sortField === field) {

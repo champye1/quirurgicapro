@@ -23,7 +23,6 @@ export default function Perfil() {
   const { showSuccess, showError } = useNotifications()
 
   const [form, setForm] = useState({ actual: '', nueva: '', confirmar: '' })
-  const [showActual, setShowActual] = useState(false)
   const [showNueva, setShowNueva] = useState(false)
   const [showConfirmar, setShowConfirmar] = useState(false)
   const [loading, setLoading] = useState(false)

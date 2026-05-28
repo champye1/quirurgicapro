@@ -2,8 +2,6 @@
  * Intercept Supabase API calls so E2E tests run without a real backend.
  */
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://mock.supabase.co'
-
 const SESSION = {
   access_token: 'mock-access-token',
   refresh_token: 'mock-refresh-token',

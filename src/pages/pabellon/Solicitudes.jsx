@@ -204,7 +204,7 @@ export default function Solicitudes() {
   // Pre-check de insumos con stock 0
   const [showInsumosAlert, setShowInsumosAlert] = useState(false)
   const [insumosConStockCero, setInsumosConStockCero] = useState([])
-  const [accionPendienteInsumosOk, setAccionPendienteInsumosOk] = useState(null)
+  const [_accionPendienteInsumosOk, setAccionPendienteInsumosOk] = useState(null)
 
   // Bulk actions
   const [seleccionados, setSeleccionados] = useState(new Set())
@@ -359,7 +359,7 @@ export default function Solicitudes() {
       return next
     })
   }
-  const toggleSeleccionarTodos = () => {
+  const _toggleSeleccionarTodos = () => {
     const pendientes = solicitudesFiltradas.filter(s => s.estado === 'pendiente').map(s => s.id)
     if (pendientes.every(id => seleccionados.has(id))) {
       setSeleccionados(new Set())
