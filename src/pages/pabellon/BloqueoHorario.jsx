@@ -19,6 +19,7 @@ export default function BloqueoHorario() {
     fecha: '',
     hora_inicio: '',
     hora_fin: '',
+    tipo_bloqueo: '',
     motivo: '',
     dias_limite_vigencia: '',
   })
@@ -182,6 +183,7 @@ export default function BloqueoHorario() {
         fecha: '',
         hora_inicio: '',
         hora_fin: '',
+        tipo_bloqueo: '',
         motivo: '',
         dias_limite_vigencia: '',
       })
@@ -218,6 +220,7 @@ export default function BloqueoHorario() {
         fecha: '',
         hora_inicio: '',
         hora_fin: '',
+        tipo_bloqueo: '',
         motivo: '',
         dias_limite_vigencia: '',
       })
@@ -355,6 +358,7 @@ export default function BloqueoHorario() {
       fecha: formData.fecha,
       hora_inicio: formData.hora_inicio,
       hora_fin: formData.hora_fin,
+      tipo_bloqueo: formData.tipo_bloqueo || null,
       motivo: formData.motivo || null,
       dias_auto_liberacion: dias != null && dias > 0 ? dias : null,
       fecha_auto_liberacion: fechaAutoLiberacion,
@@ -387,6 +391,7 @@ export default function BloqueoHorario() {
       fecha: bloqueo.fecha,
       hora_inicio: bloqueo.hora_inicio,
       hora_fin: bloqueo.hora_fin,
+      tipo_bloqueo: bloqueo.tipo_bloqueo || '',
       motivo: bloqueo.motivo || '',
       dias_limite_vigencia: bloqueo.dias_auto_liberacion != null ? String(bloqueo.dias_auto_liberacion) : '',
     })
@@ -553,6 +558,23 @@ export default function BloqueoHorario() {
             </div>
 
             <div>
+              <label className="label-field">Tipo de Bloqueo</label>
+              <select
+                value={formData.tipo_bloqueo}
+                onChange={(e) => setFormData({ ...formData, tipo_bloqueo: e.target.value })}
+                className="input-field"
+              >
+                <option value="">Sin clasificar</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="convenio">Convenio</option>
+                <option value="limpieza">Limpieza</option>
+                <option value="capacitacion">Capacitación</option>
+                <option value="emergencia">Emergencia</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+
+            <div>
               <label className="label-field">Motivo</label>
               <textarea
                 value={formData.motivo}
@@ -624,6 +646,23 @@ export default function BloqueoHorario() {
                         <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>
                           Dr. {bloqueo.doctors.nombre} {bloqueo.doctors.apellido}
                         </p>
+                      )}
+                      {bloqueo.tipo_bloqueo && (
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                          bloqueo.tipo_bloqueo === 'emergencia'
+                            ? theme === 'dark' ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-700'
+                            : bloqueo.tipo_bloqueo === 'mantenimiento'
+                            ? theme === 'dark' ? 'bg-yellow-900/50 text-yellow-300' : 'bg-yellow-100 text-yellow-700'
+                            : bloqueo.tipo_bloqueo === 'limpieza'
+                            ? theme === 'dark' ? 'bg-cyan-900/50 text-cyan-300' : 'bg-cyan-100 text-cyan-700'
+                            : bloqueo.tipo_bloqueo === 'capacitacion'
+                            ? theme === 'dark' ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-700'
+                            : bloqueo.tipo_bloqueo === 'convenio'
+                            ? theme === 'dark' ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-700'
+                            : theme === 'dark' ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {bloqueo.tipo_bloqueo}
+                        </span>
                       )}
                       {bloqueo.motivo && (
                         <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-slate-200' : 'text-gray-600'}`}>{bloqueo.motivo}</p>

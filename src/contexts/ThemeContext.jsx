@@ -44,7 +44,7 @@ const applyThemeToDOM = (themeName) => {
   }
   
   // Guardar en localStorage inmediatamente
-  localStorage.setItem('app-theme', themeName)
+  try { localStorage.setItem('app-theme', themeName) } catch (_) { /* test env */ }
   
   // Forzar reflow para aplicar cambios inmediatamente
   void document.body.offsetHeight

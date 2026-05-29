@@ -65,9 +65,11 @@ export default function Solicitudes() {
             supplies:supply_id(nombre, codigo)
           ),
           surgeries(
+            id,
             fecha,
             hora_inicio,
             hora_fin,
+            estado,
             estado_hora,
             fecha_anterior,
             hora_inicio_anterior,
@@ -295,12 +297,21 @@ export default function Solicitudes() {
   }
 
   const cancelarSolicitud = useMutation({
-    mutationFn: async ({ solicitudId, estadoActual }) => {
+    mutationFn: async ({ solicitudId, estadoActual, cirugiaId }) => {
       const { error } = await supabase
         .from('surgery_requests')
         .update({ estado: 'cancelada', updated_at: new Date().toISOString() })
         .eq('id', solicitudId)
       if (error) throw error
+      // Cancelar la cirugía programada si existe
+      if (cirugiaId) {
+        await supabase
+          .from('surgeries')
+          .update({ estado: 'cancelada' })
+          .eq('id', cirugiaId)
+          .eq('estado', 'programada')
+          .catch(() => {})
+      }
       // Si estaba aceptada, notificar a los usuarios de pabellón
       if (estadoActual === 'aceptada') {
         const { data: pabellonUsers } = await supabase
@@ -574,7 +585,7 @@ export default function Solicitudes() {
               <Button
                 type="button"
                 loading={cancelarSolicitud.isPending}
-                onClick={() => cancelarSolicitud.mutate({ solicitudId: solicitudACancelar.id, estadoActual: solicitudACancelar.estado })}
+                onClick={() => cancelarSolicitud.mutate({ solicitudId: solicitudACancelar.id, estadoActual: solicitudACancelar.estado, cirugiaId: solicitudACancelar.surgeries?.[0]?.id })}
                 className="bg-red-600 hover:bg-red-700"
               >
                 Sí, cancelar

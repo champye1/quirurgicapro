@@ -1,7 +1,7 @@
 import { lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import {
-  Home, FileText, Calendar, Clock, Users, Package, Mail, FileSearch, User, Settings,
+  Home, FileText, Calendar, Clock, Users, Package, Mail, FileSearch, User, Settings, BarChart2, MessageSquare,
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../config/supabase'
@@ -14,6 +14,8 @@ const BloqueoHorario = lazy(() => import('../pages/pabellon/BloqueoHorario'))
 const Medicos       = lazy(() => import('../pages/pabellon/Medicos'))
 const Insumos       = lazy(() => import('../pages/pabellon/Insumos'))
 const Auditoria     = lazy(() => import('../pages/pabellon/Auditoria'))
+const Estadisticas    = lazy(() => import('../pages/pabellon/Estadisticas'))
+const ChatPabellon    = lazy(() => import('../pages/pabellon/Chat'))
 const Correos         = lazy(() => import('../pages/pabellon/Correos'))
 const Configuracion   = lazy(() => import('../pages/pabellon/Configuracion'))
 const Perfil          = lazy(() => import('../pages/Perfil'))
@@ -25,7 +27,9 @@ const MENU = [
   { path: '/pabellon/bloqueo',     icon: Clock,     label: 'Bloqueo Horario' },
   { path: '/pabellon/medicos',     icon: Users,     label: 'Médicos' },
   { path: '/pabellon/insumos',     icon: Package,   label: 'Insumos' },
-  { path: '/pabellon/correos',     icon: Mail,      label: 'Correos', badge: true },
+  { path: '/pabellon/estadisticas', icon: BarChart2,      label: 'Estadísticas' },
+  { path: '/pabellon/chat',         icon: MessageSquare,  label: 'Chat Médicos' },
+  { path: '/pabellon/correos',      icon: Mail,           label: 'Correos', badge: true },
   { path: '/pabellon/auditoria',      icon: FileSearch, label: 'Auditoría' },
   { path: '/pabellon/configuracion', icon: Settings,   label: 'Configuración' },
   { path: '/pabellon/perfil',        icon: User,       label: 'Mi Perfil' },
@@ -72,6 +76,8 @@ export default function PabellonLayout() {
         <Route path="/bloqueo"     element={<BloqueoHorario />} />
         <Route path="/medicos"     element={<Medicos />} />
         <Route path="/insumos"     element={<Insumos />} />
+        <Route path="/estadisticas"   element={<Estadisticas />} />
+        <Route path="/chat"           element={<ChatPabellon />} />
         <Route path="/correos"        element={<Correos />} />
         <Route path="/auditoria"      element={<Auditoria />} />
         <Route path="/configuracion"  element={<Configuracion />} />

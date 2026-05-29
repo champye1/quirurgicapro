@@ -13,6 +13,7 @@ const LoginDoctor       = lazy(() => import('./pages/auth/LoginDoctor'))
 const RecuperarContraseña   = lazy(() => import('./pages/auth/RecuperarContraseña'))
 const RestablecerContraseña = lazy(() => import('./pages/auth/RestablecerContraseña'))
 const ContactoExterno   = lazy(() => import('./pages/public/ContactoExterno'))
+const PortalPaciente    = lazy(() => import('./pages/public/PortalPaciente'))
 const PabellonLayout    = lazy(() => import('./layouts/PabellonLayout'))
 const DoctorLayout      = lazy(() => import('./layouts/DoctorLayout'))
 
@@ -207,6 +208,8 @@ function AppContent() {
       <Route path="/restablecer-contrasena" element={<RestablecerContraseña />} />
       {/* Ruta pública para médicos externos — no requiere autenticación */}
       <Route path="/contacto" element={<ContactoExterno />} />
+      {/* Portal de paciente — acceso público por token */}
+      <Route path="/portal/paciente/:token" element={<PortalPaciente />} />
       
       <Route 
         path="/pabellon/*" 

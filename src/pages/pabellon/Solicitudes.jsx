@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { CheckCircle2, Clock, Eye, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Lock, Search, XCircle, CheckSquare, Square, Ban, AlertCircle, Download } from 'lucide-react'
+import { CheckCircle2, Clock, Eye, CalendarClock, X, User, Stethoscope, Package, FileText, CheckCircle, Activity, Lock, Search, XCircle, CheckSquare, Square, Ban, AlertCircle, Download, Link2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { codigosOperaciones } from '../../data/codigosOperaciones'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -194,6 +194,9 @@ export default function Solicitudes() {
   const [showConfirmRechazar, setShowConfirmRechazar] = useState(false)
   const [solicitudARechazar, setSolicitudARechazar] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
+
+  const [generandoEnlace, setGenerandoEnlace] = useState(false)
+  const [enlaceCopiadoId, setEnlaceCopiadoId] = useState(null)
 
   // Lifecycle: completar / cancelar cirugía
   const [showCompletarModal, setShowCompletarModal] = useState(false)
@@ -886,6 +889,28 @@ export default function Solicitudes() {
     return codigoObj?.nombre || codigo
   }
 
+
+  const generarEnlacePaciente = async (solicitudId) => {
+    setGenerandoEnlace(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data, error } = await supabase
+        .from('patient_access_tokens')
+        .insert({ surgery_request_id: solicitudId, created_by: user.id })
+        .select('token')
+        .single()
+      if (error) throw error
+      const url = `${window.location.origin}/portal/paciente/${data.token}`
+      await navigator.clipboard.writeText(url)
+      setEnlaceCopiadoId(solicitudId)
+      setTimeout(() => setEnlaceCopiadoId(null), 3000)
+      showSuccess('Enlace copiado al portapapeles')
+    } catch (err) {
+      showError('Error al generar enlace: ' + (err.message || 'Error desconocido'))
+    } finally {
+      setGenerandoEnlace(false)
+    }
+  }
 
   const exportarExcel = async () => {
     const { utils, writeFile } = await import('xlsx')
@@ -1609,7 +1634,16 @@ export default function Solicitudes() {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex items-center justify-between gap-3 flex-wrap">
+              <button
+                onClick={() => generarEnlacePaciente(solicitudDetalle.id)}
+                disabled={generandoEnlace}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-2 border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                title="Generar enlace de seguimiento para el paciente"
+              >
+                <Link2 className="w-4 h-4" />
+                {enlaceCopiadoId === solicitudDetalle.id ? '¡Enlace copiado!' : 'Compartir con paciente'}
+              </button>
               <button
                 onClick={() => { setSolicitudDetalle(null); setTimeout(() => window.scrollTo({ top: scrollYRef.current, behavior: 'instant' }), 0) }}
                 className="btn-secondary"
