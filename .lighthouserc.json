@@ -1,8 +1,9 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist",
-      "url": ["http://localhost/login/pabellon", "http://localhost/login/doctor"]
+      "startServerCommand": "npx vite preview --port 3000 --host",
+      "startServerReadyPattern": "Local:",
+      "url": ["http://localhost:3000/login/pabellon", "http://localhost:3000/login/doctor"]
     },
     "assert": {
       "preset": "lighthouse:recommended",
