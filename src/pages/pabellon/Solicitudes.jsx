@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
@@ -31,6 +31,7 @@ export default function Solicitudes() {
   const debouncedBusqueda = useDebounce(busqueda, 300)
   const [solicitudProgramando, setSolicitudProgramando] = useState(null)
   const [solicitudDetalle, setSolicitudDetalle] = useState(null)
+  const scrollYRef = useRef(0)
   const [solicitudAceptandoHorario, setSolicitudAceptandoHorario] = useState(null)
   
   // Verificar si hay un slot seleccionado desde el calendario
@@ -359,7 +360,7 @@ export default function Solicitudes() {
       return next
     })
   }
-  const _toggleSeleccionarTodos = () => {
+  const toggleSeleccionarTodos = () => {
     const pendientes = solicitudesFiltradas.filter(s => s.estado === 'pendiente').map(s => s.id)
     if (pendientes.every(id => seleccionados.has(id))) {
       setSeleccionados(new Set())
@@ -1123,26 +1124,50 @@ export default function Solicitudes() {
       </div>
 
       {/* Barra de acciones masivas */}
-      {seleccionados.size > 0 && (
-        <div className={`sticky top-2 z-30 flex items-center justify-between gap-3 rounded-2xl border-2 px-4 py-3 shadow-lg ${
-          theme === 'dark' ? 'bg-slate-800 border-blue-700' : 'bg-blue-50 border-blue-400'
-        }`}>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSeleccionados(new Set())} aria-label="Limpiar selección">
-              <X className={`w-4 h-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`} aria-hidden="true" />
-            </button>
-            <span className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>
-              {seleccionados.size} seleccionada{seleccionados.size !== 1 ? 's' : ''}
-            </span>
+      {(() => {
+        const pendientesVisibles = solicitudesFiltradas.filter(s => s.estado === 'pendiente')
+        const todasSeleccionadas = pendientesVisibles.length > 0 && pendientesVisibles.every(s => seleccionados.has(s.id))
+        return pendientesVisibles.length > 0 && (
+          <div className={`sticky top-2 z-30 flex items-center justify-between gap-3 rounded-2xl border-2 px-4 py-3 shadow-lg ${
+            seleccionados.size > 0
+              ? (theme === 'dark' ? 'bg-slate-800 border-blue-700' : 'bg-blue-50 border-blue-400')
+              : (theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200')
+          }`}>
+            <div className="flex items-center gap-3">
+              {seleccionados.size > 0 && (
+                <button onClick={() => setSeleccionados(new Set())} aria-label="Limpiar selección">
+                  <X className={`w-4 h-4 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`} aria-hidden="true" />
+                </button>
+              )}
+              <button
+                onClick={toggleSeleccionarTodos}
+                className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-colors ${
+                  theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-blue-600'
+                }`}
+                aria-label={todasSeleccionadas ? 'Deseleccionar todas' : 'Seleccionar todas las pendientes'}
+              >
+                {todasSeleccionadas
+                  ? <CheckSquare className="w-4 h-4 text-blue-600" aria-hidden="true" />
+                  : <Square className="w-4 h-4" aria-hidden="true" />
+                }
+                {seleccionados.size > 0
+                  ? `${seleccionados.size} seleccionada${seleccionados.size !== 1 ? 's' : ''}`
+                  : 'Seleccionar todas las pendientes'
+                }
+              </button>
+            </div>
+            {seleccionados.size > 0 && (
+              <button
+                onClick={() => setShowBulkRechazarModal(true)}
+                disabled={rechazarBulk.isPending}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xs uppercase rounded-xl transition-colors"
+              >
+                {rechazarBulk.isPending ? 'Rechazando...' : 'Rechazar seleccionadas'}
+              </button>
+            )}
           </div>
-          <button
-            onClick={() => setShowBulkRechazarModal(true)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase rounded-xl transition-colors"
-          >
-            Rechazar seleccionadas
-          </button>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Tarjetas de solicitudes */}
       <div className="grid gap-4 sm:gap-6">
@@ -1226,7 +1251,7 @@ export default function Solicitudes() {
                   <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
                     {/* Botón Ver Detalles */}
                     <button
-                      onClick={() => setSolicitudDetalle(solicitud)}
+                      onClick={() => { scrollYRef.current = window.scrollY; setSolicitudDetalle(solicitud) }}
                       className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl transition-all border touch-manipulation active:scale-95 ${
                         theme === 'dark'
                           ? 'text-blue-400 hover:bg-blue-900/30 border-blue-800 hover:border-blue-600'
@@ -1342,11 +1367,12 @@ export default function Solicitudes() {
 
       {/* Modal de Detalles */}
       {solicitudDetalle && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="presentation">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="presentation" onClick={() => { setSolicitudDetalle(null); setTimeout(() => window.scrollTo({ top: scrollYRef.current, behavior: 'instant' }), 0) }}>
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Detalles de la Solicitud"
+            onClick={e => e.stopPropagation()}
             className={`rounded-[2rem] p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar ${
             theme === 'dark'
               ? 'bg-slate-800'
@@ -1359,7 +1385,7 @@ export default function Solicitudes() {
                 theme === 'dark' ? 'text-white' : 'text-slate-900'
               }`}>Detalles de la Solicitud</h2>
               <button
-                onClick={() => setSolicitudDetalle(null)}
+                onClick={() => { setSolicitudDetalle(null); setTimeout(() => window.scrollTo({ top: scrollYRef.current, behavior: 'instant' }), 0) }}
                 className={`p-2 rounded-xl transition-colors ${
                   theme === 'dark'
                     ? 'hover:bg-slate-700'
@@ -1585,7 +1611,7 @@ export default function Solicitudes() {
 
             <div className="mt-6 flex justify-end">
               <button
-                onClick={() => setSolicitudDetalle(null)}
+                onClick={() => { setSolicitudDetalle(null); setTimeout(() => window.scrollTo({ top: scrollYRef.current, behavior: 'instant' }), 0) }}
                 className="btn-secondary"
               >
                 Cerrar

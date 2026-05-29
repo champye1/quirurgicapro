@@ -366,7 +366,7 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
             <button
               onClick={() => setShowCommandPalette(true)}
               title="Búsqueda global (Ctrl+K)"
-              className={`hidden sm:flex items-center gap-2 h-8 sm:h-10 px-3 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : isMedical ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100' : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50'} rounded-xl border transition-all text-xs font-bold`}
+              className={`flex items-center gap-2 h-8 sm:h-10 px-2.5 sm:px-3 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : isMedical ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100' : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-blue-600 hover:bg-blue-50'} rounded-xl border transition-all text-xs font-bold`}
               aria-label="Búsqueda global"
             >
               <Search className="w-3.5 h-3.5" />

@@ -12,6 +12,22 @@ import Pagination from '../../components/common/Pagination'
 import { TableSkeleton } from '../../components/common/Skeleton'
 import { useTheme } from '../../contexts/ThemeContext'
 
+const TABLA_LABELS = {
+  surgery_requests: 'Solicitudes de Cirugía',
+  surgeries: 'Cirugías',
+  patients: 'Pacientes',
+  doctors: 'Médicos',
+  supplies: 'Insumos',
+  operating_rooms: 'Pabellones',
+  schedule_blocks: 'Bloqueos de Horario',
+  clinic_settings: 'Configuración',
+  external_messages: 'Correos Externos',
+  notifications: 'Notificaciones',
+  users: 'Usuarios',
+}
+
+const tablaLabel = (nombre) => TABLA_LABELS[nombre] || nombre
+
 export default function Auditoria() {
   const [busqueda, setBusqueda] = useState('')
   const [filtroTabla, setFiltroTabla] = useState('')
@@ -224,7 +240,7 @@ export default function Auditoria() {
               >
                 <option value="">Todas las tablas</option>
                 {tablasUnicas.map(tabla => (
-                  <option key={tabla} value={tabla}>{tabla}</option>
+                  <option key={tabla} value={tabla}>{tablaLabel(tabla)}</option>
                 ))}
               </select>
             </div>
@@ -329,7 +345,7 @@ export default function Auditoria() {
                       <td className={`py-3 px-4 text-sm ${theme === 'dark' ? 'text-slate-100' : 'text-gray-700'}`}>
                         <div className="flex items-center gap-2">
                           <Clock className={`w-4 h-4 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-400'}`} />
-                          {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: es })}
+                          {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: es })} CLT
                         </div>
                       </td>
                       <td className={`py-3 px-4 ${theme === 'dark' ? 'text-slate-100' : 'text-gray-700'}`}>
@@ -346,7 +362,7 @@ export default function Auditoria() {
                       <td className={`py-3 px-4 ${theme === 'dark' ? 'text-slate-100' : 'text-gray-700'}`}>
                         <div className="flex items-center gap-2">
                           <Database className={`w-4 h-4 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-400'}`} />
-                          <span className="text-sm font-mono">{log.tabla_afectada}</span>
+                          <span className="text-sm font-mono">{tablaLabel(log.tabla_afectada)}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4">
