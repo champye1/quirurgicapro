@@ -192,7 +192,7 @@ export default function LoginDoctor() {
       <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl w-full max-w-md border border-slate-100">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 font-bold text-[10px] sm:text-xs uppercase tracking-widest touch-manipulation"
+          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 font-bold text-xs uppercase tracking-widest touch-manipulation"
         >
           <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
           Volver a inicio
@@ -205,14 +205,14 @@ export default function LoginDoctor() {
         </div>
         <div className="text-center mb-8 sm:mb-10">
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tighter">Acceso Doctor</h1>
-          <p className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-2">Portal Médico</p>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">Portal Médico</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
           {lockoutInfo?.isLocked && (
             <div className="bg-orange-50 border-2 border-orange-200 text-orange-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl flex items-center gap-2 animate-in fade-in duration-300">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-              <span className="text-[10px] sm:text-xs font-bold break-words">
+              <span className="text-xs font-bold break-words">
                 Cuenta bloqueada. Intenta nuevamente en {lockoutInfo.remainingTime}.
               </span>
             </div>
@@ -229,19 +229,19 @@ export default function LoginDoctor() {
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5">
                 {errorType === 'blocked_account' && (
-                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-700">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-700">
                     Aviso: no puede acceder al portal
                   </span>
                 )}
-                <span className="text-[10px] sm:text-xs font-bold break-words">{error}</span>
+                <span className="text-xs font-bold break-words">{error}</span>
               </div>
             </div>
           )}
 
           <div className="space-y-1.5 sm:space-y-2">
-            <label htmlFor="email" className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Usuario o Correo</label>
+            <label htmlFor="email" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Usuario o Correo</label>
             <div className="relative">
-              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="email"
                 type="text"
@@ -253,15 +253,15 @@ export default function LoginDoctor() {
                 disabled={loading}
               />
             </div>
-            <p className="text-[10px] sm:text-xs text-slate-400 ml-1">
+            <p className="text-xs text-slate-500 ml-1">
               Puedes ingresar con tu nombre de usuario o correo electrónico
             </p>
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
-            <label htmlFor="password" className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contraseña</label>
+            <label htmlFor="password" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Contraseña</label>
             <div className="relative">
-              <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -296,7 +296,7 @@ export default function LoginDoctor() {
             <button
               type="button"
               onClick={() => navigate('/recuperar-contrasena')}
-              className="text-slate-500 hover:text-green-600 text-[10px] sm:text-xs font-bold transition-colors"
+              className="text-slate-500 hover:text-green-600 text-xs font-bold transition-colors"
             >
               ¿Olvidaste tu contraseña?
             </button>

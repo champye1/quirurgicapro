@@ -127,11 +127,12 @@ export default function LoginPabellon() {
       <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl w-full max-w-md border border-slate-100">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 font-bold text-[10px] sm:text-xs uppercase tracking-widest touch-manipulation"
+          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 sm:mb-8 font-bold text-xs uppercase tracking-widest touch-manipulation"
         >
           <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
           Volver a inicio
         </button>
+
 
         <div className="flex justify-center mb-6 sm:mb-8">
           <div className="bg-blue-600 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl shadow-blue-200 rotate-6">
@@ -140,14 +141,14 @@ export default function LoginPabellon() {
         </div>
         <div className="text-center mb-8 sm:mb-10">
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tighter">Acceso Pabellón</h1>
-          <p className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-2">Portal de Gestión de Pabellones</p>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2">Portal de Gestión de Pabellones</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
           {lockoutInfo?.isLocked && (
             <div className="bg-orange-50 border-2 border-orange-200 text-orange-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl flex items-center gap-2 animate-in fade-in duration-300">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-              <span className="text-[10px] sm:text-xs font-bold break-words">
+              <span className="text-xs font-bold break-words">
                 Cuenta bloqueada. Intenta nuevamente en {lockoutInfo.remainingTime}.
               </span>
             </div>
@@ -156,18 +157,18 @@ export default function LoginPabellon() {
           {error && (
             <div className="bg-red-50 border-2 border-red-200 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl flex items-center gap-2 animate-in fade-in duration-300">
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-              <span className="text-[10px] sm:text-xs font-bold break-words">
-                {error === 'ROLE_MISMATCH_DOCTOR' 
-                  ? 'Tienes que ingresar como Doctor' 
+              <span className="text-xs font-bold break-words">
+                {error === 'ROLE_MISMATCH_DOCTOR'
+                  ? 'Tienes que ingresar como Doctor'
                   : error}
               </span>
             </div>
           )}
 
           <div className="space-y-1.5 sm:space-y-2">
-            <label htmlFor="email" className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Usuario</label>
+            <label htmlFor="email" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Usuario</label>
             <div className="relative">
-              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="email"
                 type="email"
@@ -182,9 +183,9 @@ export default function LoginPabellon() {
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
-            <label htmlFor="password" className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contraseña</label>
+            <label htmlFor="password" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Contraseña</label>
             <div className="relative">
-              <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -198,6 +199,7 @@ export default function LoginPabellon() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 tabIndex={-1}
               >

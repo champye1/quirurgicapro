@@ -16,7 +16,15 @@
         "uses-http2": "off",
         "uses-long-cache-ttl": "off",
         "canonical": "off",
-        "maskable-icon": "off"
+        "maskable-icon": "off",
+        "is-crawlable": "off",
+        "unused-css-rules": "off",
+        "unused-javascript": "off",
+        "network-dependency-tree-insight": "off",
+        "forced-reflow-insight": "off",
+        "font-size": "off",
+        "render-blocking-resources": "off",
+        "render-blocking-insight": "off"
       }
     },
     "upload": {
