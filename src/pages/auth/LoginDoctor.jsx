@@ -200,7 +200,7 @@ export default function LoginDoctor() {
 
         <div className="flex justify-center mb-6 sm:mb-8">
           <div className="bg-green-600 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl shadow-green-200 rotate-6">
-              <Stethoscope className="text-white w-6 h-6 sm:w-8 sm:h-8" />
+              <Stethoscope aria-hidden="true" className="text-white w-6 h-6 sm:w-8 sm:h-8" />
           </div>
         </div>
         <div className="text-center mb-8 sm:mb-10">
@@ -241,7 +241,7 @@ export default function LoginDoctor() {
           <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="email" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Usuario o Correo</label>
             <div className="relative">
-              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Mail aria-hidden="true" className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="email"
                 type="text"
@@ -261,7 +261,7 @@ export default function LoginDoctor() {
           <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="password" className="text-xs font-black text-slate-600 uppercase tracking-widest ml-1">Contraseña</label>
             <div className="relative">
-              <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Lock aria-hidden="true" className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -276,10 +276,10 @@ export default function LoginDoctor() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors"
-                title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? <EyeOff aria-hidden="true" className="w-5 h-5" /> : <Eye aria-hidden="true" className="w-5 h-5" />}
               </button>
             </div>
           </div>
