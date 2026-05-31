@@ -23,8 +23,13 @@ test.describe('Login pabellón', () => {
 
   test('redirige al dashboard tras login exitoso', async ({ page }) => {
     await mockAuth(page)
-    // mock DB calls to avoid real queries
+    // catch-all first (lowest priority in LIFO)
     await page.route('**/rest/v1/**', r => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }))
+    // users table: return pabellon role (registered last = highest priority)
+    await page.route('**/rest/v1/users**', r => r.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify([{ id: 'mock-user-id', role: 'pabellon' }]),
+    }))
     await page.route('**/auth/v1/user**', r =>
       r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 'u1', email: 'pabellon@test.com' }) })
     )

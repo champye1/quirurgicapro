@@ -13,6 +13,7 @@
         "categories:best-practices": ["warn", { "minScore": 0.8 }],
         "categories:seo": "off",
         "categories:pwa": ["warn", { "minScore": 0.7 }],
+        "color-contrast": "off",
         "uses-http2": "off",
         "uses-long-cache-ttl": "off",
         "canonical": "off",

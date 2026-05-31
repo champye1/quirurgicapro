@@ -29,7 +29,17 @@ test.describe('Login doctor', () => {
 
   test('redirige al dashboard doctor tras login exitoso', async ({ page }) => {
     await mockAuth(page, { email: 'doctor@test.com' })
+    // catch-all first (lowest priority in LIFO)
     await page.route('**/rest/v1/**', r => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }))
+    // specific table mocks registered last = higher priority
+    await page.route('**/rest/v1/users**', r => r.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify([{ id: 'mock-user-id', role: 'doctor' }]),
+    }))
+    await page.route('**/rest/v1/doctors**', r => r.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify([{ id: 'mock-doctor-id', user_id: 'mock-user-id', acceso_web_enabled: true, estado: 'activo' }]),
+    }))
     await page.route('**/auth/v1/user**', r =>
       r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 'u2', email: 'doctor@test.com' }) })
     )
