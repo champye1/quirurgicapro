@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, MessageSquare, Mail, Book, Phone, ExternalLink } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useClinicInfo } from '../../hooks/useClinicInfo'
 
 const FAQS = [
   {
@@ -111,6 +112,11 @@ export default function Ayuda() {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [categoriaActiva, setCategoriaActiva] = useState('Solicitudes')
+  const { data: clinicInfo } = useClinicInfo()
+
+  const emailSoporte = clinicInfo?.email || 'soporte@quirurgicapro.cl'
+  const telefonoSoporte = clinicInfo?.telefono || '+56 9 1234 5678'
+  const nombreClinica = clinicInfo?.nombre || 'QuirúrgicaPro'
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -127,8 +133,8 @@ export default function Ayuda() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { icon: MessageSquare, label: 'Chat en vivo', desc: 'Lun–Vie 9:00–18:00', color: 'bg-blue-100 text-blue-700' },
-          { icon: Mail, label: 'Correo soporte', desc: 'soporte@quirurgicapro.cl', color: 'bg-purple-100 text-purple-700' },
-          { icon: Phone, label: 'Teléfono', desc: '+56 9 1234 5678', color: 'bg-green-100 text-green-700' },
+          { icon: Mail, label: 'Correo soporte', desc: emailSoporte, color: 'bg-purple-100 text-purple-700' },
+          { icon: Phone, label: 'Teléfono', desc: telefonoSoporte, color: 'bg-green-100 text-green-700' },
         ].map(item => {
           const Icon = item.icon
           return (
@@ -183,11 +189,11 @@ export default function Ayuda() {
         <div>
           <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>¿No encontraste tu respuesta?</p>
           <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Escríbenos y te responderemos en menos de 4 horas hábiles
+            Escríbenos a {emailSoporte} · {nombreClinica} responde en menos de 4 horas hábiles
           </p>
         </div>
         <a
-          href="mailto:soporte@quirurgicapro.cl"
+          href={`mailto:${emailSoporte}`}
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-xs font-black rounded-xl hover:bg-blue-700 transition-colors"
         >
           Contactar soporte

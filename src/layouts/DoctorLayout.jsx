@@ -46,7 +46,7 @@ export default function DoctorLayout() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
-      const { data } = await supabase.from('doctors').select('nombre, apellido').eq('user_id', user.id).maybeSingle()
+      const { data } = await supabase.from('doctors').select('id, nombre, apellido').eq('user_id', user.id).maybeSingle()
       return data
     },
     enabled: !onboardingDone,
@@ -64,6 +64,7 @@ export default function DoctorLayout() {
       {showWizard && (
         <OnboardingMedico
           doctorNombre={doctorInfo?.nombre}
+          doctorId={doctorInfo?.id}
           onComplete={() => setOnboardingDone(true)}
         />
       )}
