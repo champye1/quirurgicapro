@@ -62,12 +62,12 @@ export default function Chat() {
       ;(data || []).forEach(msg => {
         const key = msg.surgery_request_id ?? '__general__'
         if (!mapa.has(key)) {
-          const sol = msg.surgery_request_id ? solicitudMap[msg.surgery_request_id] : null
+          const sol = msg.surgery_request_id ? (solicitudMap[msg.surgery_request_id] ?? null) : null
           mapa.set(key, {
             surgery_request_id: msg.surgery_request_id,
             lastMessage: msg,
             label: sol
-              ? `${sol.codigo_operacion} — ${sol.patients?.nombre ?? ''} ${sol.patients?.apellido ?? ''}`
+              ? `${sol.codigo_operacion ?? '—'} — ${sol.patients?.nombre ?? ''} ${sol.patients?.apellido ?? ''}`.trim()
               : 'Canal General',
             unread: 0,
           })
@@ -98,6 +98,9 @@ export default function Chat() {
 
   const totalUnread = threads.reduce((acc, t) => acc + t.unread, 0)
   const selectedKey = selectedRequest ?? '__general__'
+  const generalThread = threads.find(t => t.surgery_request_id === null)
+  const generalUnread = generalThread?.unread ?? 0
+  const requestThreads = threads.filter(t => t.surgery_request_id !== null)
 
   const cardBg = dark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
   const textPrimary = dark ? 'text-white' : 'text-slate-900'
@@ -136,6 +139,7 @@ export default function Chat() {
           {/* Canal general */}
           <button
             onClick={() => setSelectedRequest(null)}
+            aria-pressed={selectedKey === '__general__'}
             className={`w-full text-left px-4 py-3 border-b transition-colors ${dark ? 'border-slate-700' : 'border-slate-200'} ${
               selectedKey === '__general__'
                 ? dark ? 'bg-blue-900/30' : 'bg-blue-50'
@@ -144,9 +148,9 @@ export default function Chat() {
           >
             <div className="flex items-center justify-between">
               <p className={`text-sm font-bold ${textPrimary}`}>Canal General</p>
-              {threads.find(t => t.surgery_request_id === null)?.unread > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {threads.find(t => t.surgery_request_id === null).unread > 9 ? '9+' : threads.find(t => t.surgery_request_id === null).unread}
+              {generalUnread > 0 && (
+                <span data-testid="general-unread" className="bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {generalUnread > 9 ? '9+' : generalUnread}
                 </span>
               )}
             </div>
@@ -154,7 +158,7 @@ export default function Chat() {
           </button>
 
           {/* Threads por solicitud */}
-          {threads.filter(t => t.surgery_request_id !== null).map(t => (
+          {requestThreads.map(t => (
             <button
               key={t.surgery_request_id}
               onClick={() => setSelectedRequest(t.surgery_request_id)}
@@ -167,7 +171,7 @@ export default function Chat() {
               <div className="flex items-center justify-between">
                 <p className={`text-xs font-bold truncate ${textPrimary}`}>{t.label}</p>
                 {t.unread > 0 && (
-                  <span className="ml-1 flex-shrink-0 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span data-testid="thread-unread" className="ml-1 flex-shrink-0 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {t.unread > 9 ? '9+' : t.unread}
                   </span>
                 )}
@@ -181,7 +185,7 @@ export default function Chat() {
             </button>
           ))}
 
-          {threads.filter(t => t.surgery_request_id !== null).length === 0 && (
+          {requestThreads.length === 0 && (
             <p className={`text-xs px-4 py-6 text-center ${textSec}`}>
               Sin conversaciones de solicitudes aún
             </p>

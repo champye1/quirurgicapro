@@ -28,5 +28,8 @@ export const lucideIcons = {
   FileSearch: Stub, FolderOpen: Stub, Folder: Stub,
   StickyNote: Stub, Database: Stub, FileSpreadsheet: Stub,
   Palmtree: Stub, UserCheck: Stub, Key: Stub, MailOpen: Stub,
-  Archive: Stub,
+  Archive: Stub, Phone: Stub, ShieldCheck: Stub, ShieldOff: Stub,
+  Smartphone: Stub, BookOpen: Stub, Book: Stub, KeyRound: Stub,
+  FileSignature: Stub, Pencil: Stub, Wifi: Stub, WifiOff: Stub,
+  Play: Stub, CheckSquare: Stub, Square: Stub,
 }

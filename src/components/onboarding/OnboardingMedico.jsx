@@ -147,16 +147,16 @@ export default function OnboardingMedico({ doctorNombre, doctorId, onComplete })
           <>
             {/* Paso tutorial */}
             <div className="overflow-y-auto flex-1 px-8 py-6 space-y-4">
-              {PASOS.map((paso) => {
-                const Icon = paso.icon
+              {PASOS.map((item) => {
+                const Icon = item.icon
                 return (
-                  <div key={paso.titulo} className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${paso.color}`}>
+                  <div key={item.titulo} className="flex items-start gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="font-black text-slate-900 text-sm">{paso.titulo}</p>
-                      <p className="text-slate-500 text-xs leading-relaxed mt-0.5">{paso.desc}</p>
+                      <p className="font-black text-slate-900 text-sm">{item.titulo}</p>
+                      <p className="text-slate-500 text-xs leading-relaxed mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 )
