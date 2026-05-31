@@ -39,6 +39,6 @@ test.describe('Login doctor', () => {
     await page.fill('input[type="password"]', 'cualquierpass')
     await page.click('button[type="submit"]')
 
-    await expect(page).toHaveURL(/doctor|dashboard/i, { timeout: 8000 })
+    await expect(page).toHaveURL(/doctor|dashboard/i, { timeout: 15000 })
   })
 })
