@@ -134,14 +134,16 @@ serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    // Leer credenciales Gmail (misma fuente que poll-gmail)
-    const { data: settingsRow } = await supabase
-      .from('clinic_settings')
-      .select('value')
-      .eq('key', 'gmail_config')
-      .maybeSingle()
-
-    const cfg               = settingsRow?.value || {}
+    // Leer credenciales Gmail: primero cifradas (clinic_secrets), luego legacy (clinic_settings)
+    let cfg: Record<string, string> = {}
+    try {
+      const { data: secretRow } = await supabase.rpc('read_clinic_secret', { p_key: 'gmail_config' })
+      if (secretRow) cfg = JSON.parse(secretRow)
+    } catch {
+      const { data: settingsRow } = await supabase
+        .from('clinic_settings').select('value').eq('key', 'gmail_config').maybeSingle()
+      cfg = (settingsRow?.value as Record<string, string>) || {}
+    }
     const gmailClientId     = cfg.client_id     || Deno.env.get('GMAIL_CLIENT_ID')     || ''
     const gmailClientSecret = cfg.client_secret || Deno.env.get('GMAIL_CLIENT_SECRET') || ''
     const gmailRefreshToken = cfg.refresh_token || Deno.env.get('GMAIL_REFRESH_TOKEN') || ''

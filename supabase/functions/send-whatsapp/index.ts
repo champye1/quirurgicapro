@@ -26,14 +26,16 @@ serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    // Leer credenciales WhatsApp desde clinic_settings
-    const { data: settingsRow } = await supabase
-      .from('clinic_settings')
-      .select('value')
-      .eq('key', 'whatsapp_config')
-      .maybeSingle()
-
-    const cfg = settingsRow?.value || {}
+    // Leer credenciales WhatsApp: primero cifradas, luego legacy
+    let cfg: Record<string, string> = {}
+    try {
+      const { data: secretRow } = await supabase.rpc('read_clinic_secret', { p_key: 'whatsapp_config' })
+      if (secretRow) cfg = JSON.parse(secretRow)
+    } catch {
+      const { data: settingsRow } = await supabase
+        .from('clinic_settings').select('value').eq('key', 'whatsapp_config').maybeSingle()
+      cfg = (settingsRow?.value as Record<string, string>) || {}
+    }
     const phoneNumberId = cfg.phone_number_id || ''
     const accessToken   = cfg.access_token || ''
 

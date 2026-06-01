@@ -117,18 +117,33 @@ export default function Medicos() {
   const debouncedBusqueda = useDebounce(busqueda, 300)
   const { theme } = useTheme()
 
-  const { data: medicos = [], isLoading } = useQuery({
-    queryKey: ['medicos'],
+  const { data: medicosData = { data: [], count: 0 }, isLoading } = useQuery({
+    queryKey: ['medicos', debouncedBusqueda, filtroEspecialidad, filtroEstado, currentPage, sortField, sortDir],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const from = (currentPage - 1) * itemsPerPage
+      const to   = from + itemsPerPage - 1
+
+      let query = supabase
         .from('doctors')
-        .select('*')
+        .select('id, nombre, apellido, rut, email, especialidad, estado, telefono, acceso_web_enabled, username, created_at', { count: 'exact' })
         .is('deleted_at', null)
-        .order('apellido', { ascending: true })
+        .order(sortField || 'apellido', { ascending: sortDir !== 'desc' })
+        .range(from, to)
+
+      if (debouncedBusqueda) {
+        const q = debouncedBusqueda.toLowerCase()
+        query = query.or(`nombre.ilike.%${q}%,apellido.ilike.%${q}%,rut.ilike.%${q}%,email.ilike.%${q}%`)
+      }
+      if (filtroEspecialidad) query = query.eq('especialidad', filtroEspecialidad)
+      if (filtroEstado)       query = query.eq('estado', filtroEstado)
+
+      const { data, error, count } = await query
       if (error) throw error
-      return data
+      return { data: data || [], count: count ?? 0 }
     },
   })
+  const medicos = medicosData.data
+  const totalMedicosCount = medicosData.count
 
   const { data: cirugiasEstaSemana = [] } = useQuery({
     queryKey: ['medicos-cirugias-semana'],
@@ -157,35 +172,18 @@ export default function Medicos() {
     return map
   }, [cirugiasEstaSemana])
 
-  const medicosFiltrados = useMemo(() => {
-    return medicos.filter(medico => {
-      if (debouncedBusqueda) {
-        const q = debouncedBusqueda.toLowerCase()
-        const nombre = `${medico.nombre} ${medico.apellido}`.toLowerCase()
-        const rut = formatRut(medico.rut).toLowerCase()
-        const email = (medico.email || '').toLowerCase()
-        if (!nombre.includes(q) && !rut.includes(q) && !email.includes(q)) return false
-      }
-      if (filtroEspecialidad && medico.especialidad !== filtroEspecialidad) return false
-      if (filtroEstado && medico.estado !== filtroEstado) return false
-      return true
-    })
-  }, [medicos, debouncedBusqueda, filtroEspecialidad, filtroEstado])
+  // Paginación server-side: el servidor ya aplica filtros, ordenamiento y rango
+  const medicosFiltrados = medicos  // alias para compatibilidad con MedicosFiltros
+  const medicosPaginados = medicos  // el servidor ya pagina
+  const totalPages = Math.ceil(totalMedicosCount / itemsPerPage)
 
-  const totalPages = Math.ceil(medicosFiltrados.length / itemsPerPage)
-
-  const medicosPaginados = useMemo(() => {
-    const sorted = [...medicosFiltrados].sort((a, b) => {
-      const va = sortField === 'nombre' ? `${a.apellido} ${a.nombre}` : (a[sortField] ?? '')
-      const vb = sortField === 'nombre' ? `${b.apellido} ${b.nombre}` : (b[sortField] ?? '')
-      const cmp = String(va).localeCompare(String(vb), 'es', { sensitivity: 'base' })
-      return sortDir === 'asc' ? cmp : -cmp
-    })
-    const start = (currentPage - 1) * itemsPerPage
-    return sorted.slice(start, start + itemsPerPage)
-  }, [medicosFiltrados, currentPage, itemsPerPage, sortField, sortDir])
+  // Reset página al cambiar filtros
+  const handleBusqueda = (v) => { setBusqueda(v); setCurrentPage(1) }
+  const handleFiltroEsp = (v) => { setFiltroEspecialidad(v); setCurrentPage(1) }
+  const handleFiltroEst = (v) => { setFiltroEstado(v); setCurrentPage(1) }
 
   const handleSort = (field) => {
+    setCurrentPage(1)
     if (sortField === field) {
       setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     } else {
@@ -197,14 +195,14 @@ export default function Medicos() {
 
   useEffect(() => { setCurrentPage(1) }, [debouncedBusqueda, filtroEspecialidad, filtroEstado])
 
-  // Auto-update username when nombre/apellido change with web access enabled
+  // Auto-generar username SOLO al crear (no al editar) y solo si todavía está vacío
   useEffect(() => {
-    if (formData.acceso_web_enabled && !medicoEditando && formData.nombre && formData.apellido) {
+    if (formData.acceso_web_enabled && !medicoEditando && !formData.username && formData.nombre && formData.apellido) {
       const nuevo = generarUsername(formData.nombre, formData.apellido)
       if (nuevo) setFormData(prev => ({ ...prev, username: nuevo }))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.nombre, formData.apellido])
+  }, [formData.nombre, formData.apellido, formData.acceso_web_enabled])
 
   const handleExportCSV = () => {
     try {
@@ -322,16 +320,32 @@ export default function Medicos() {
       }
       if (!functionData) throw new Error('Respuesta vacía de la Edge Function')
       if (!functionData.success) throw new Error(functionData.error || 'Error al crear médico')
-      return { ...functionData.doctor, tempPassword: functionData.tempPassword }
+      return {
+        ...functionData.doctor,
+        username: functionData.username,
+        resetLinkSent: functionData.resetLinkSent,
+        resetLink: functionData.resetLink,
+      }
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['medicos'] })
       setMostrarFormulario(false)
       setFormData(EMPTY_FORM)
       setShowPassword(false)
-      if (result.tempPassword) {
-        // Mostrar contraseña en modal dedicado en lugar de toast (evita exposición en screenshots)
-        setCredencialesModal({ nombre: `${result.nombre} ${result.apellido}`, username: result.username || result.email, email: result.email, password: result.tempPassword })
+      if (result.resetLinkSent) {
+        notifyDoctorAction('create', `${result.nombre} ${result.apellido}`,
+          `✉️ Se envió un enlace de acceso al email del médico.\n👤 Usuario: ${result.username || result.email}`)
+      } else if (result.resetLink) {
+        // Fallback: Gmail no configurado, mostrar enlace en modal para copia manual
+        setCredencialesModal({
+          nombre: `${result.nombre} ${result.apellido}`,
+          username: result.username || result.email,
+          email: result.email,
+          resetLink: result.resetLink,
+        })
+      } else if (result.username) {
+        notifyDoctorAction('create', `${result.nombre} ${result.apellido}`,
+          `👤 Usuario: ${result.username || result.email}\n⚠️ Configura Gmail para enviar el enlace de acceso automáticamente.`)
       } else {
         notifyDoctorAction('create', `${result.nombre} ${result.apellido}`, 'Acceso web deshabilitado.')
       }
@@ -577,11 +591,11 @@ export default function Medicos() {
 
       <MedicosFiltros
         busqueda={busqueda}
-        setBusqueda={setBusqueda}
+        setBusqueda={handleBusqueda}
         filtroEspecialidad={filtroEspecialidad}
-        setFiltroEspecialidad={setFiltroEspecialidad}
+        setFiltroEspecialidad={handleFiltroEsp}
         filtroEstado={filtroEstado}
-        setFiltroEstado={setFiltroEstado}
+        setFiltroEstado={handleFiltroEst}
         medicosFiltrados={medicosFiltrados}
         medicos={medicos}
         especialidades={ESPECIALIDADES}
@@ -644,21 +658,35 @@ export default function Medicos() {
       {/* Modal de credenciales — mostrado en lugar de toast para evitar exposición en screenshots */}
       {credencialesModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 max-w-sm w-full space-y-4">
-            <h2 className="text-lg font-black text-slate-900">Médico creado — Credenciales de acceso</h2>
-            <p className="text-sm text-slate-500">Anota estas credenciales antes de cerrar. No se mostrarán nuevamente.</p>
-            <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm font-mono">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 max-w-md w-full space-y-4">
+            <h2 className="text-lg font-black text-slate-900">Médico creado — Enlace de acceso</h2>
+            <p className="text-sm text-slate-500">
+              Gmail no está configurado. Comparte este enlace con el médico para que establezca su contraseña.
+              Expira en 24 horas y es de un solo uso.
+            </p>
+            <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
               <p><span className="text-slate-500">Nombre:</span> <strong>{credencialesModal.nombre}</strong></p>
               <p><span className="text-slate-500">Usuario:</span> <strong>{credencialesModal.username}</strong></p>
               <p><span className="text-slate-500">Email:</span> <strong>{credencialesModal.email}</strong></p>
-              <p><span className="text-slate-500">Contraseña:</span> <strong>{credencialesModal.password}</strong></p>
             </div>
-            <p className="text-xs text-amber-600 font-semibold">⚠️ El médico debe cambiar su contraseña al ingresar por primera vez.</p>
+            {credencialesModal.resetLink && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-blue-700 mb-2">Enlace para establecer contraseña:</p>
+                <p className="text-xs font-mono break-all text-blue-800">{credencialesModal.resetLink}</p>
+                <button
+                  onClick={() => navigator.clipboard.writeText(credencialesModal.resetLink).then(() => showSuccess('Enlace copiado'))}
+                  className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg"
+                >
+                  Copiar enlace
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-amber-600 font-semibold">⚠️ Configura Gmail en Correos → Configurar Gmail para enviar estos enlaces automáticamente.</p>
             <button
               onClick={() => setCredencialesModal(null)}
               className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors"
             >
-              Entendido, ya las anoté
+              Entendido
             </button>
           </div>
         </div>

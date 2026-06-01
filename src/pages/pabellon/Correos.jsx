@@ -115,10 +115,12 @@ export default function Correos() {
 
   const guardarGmailConfig = useMutation({
     mutationFn: async (form) => {
-      const { error } = await supabase
-        .from('clinic_settings')
-        .upsert({ key: 'gmail_config', value: form, updated_at: new Date().toISOString() }, { onConflict: 'key' })
-      if (error) throw error
+      const { data: { session } } = await supabase.auth.getSession()
+      const { data, error } = await supabase.functions.invoke('save-clinic-secret', {
+        body: { key: 'gmail_config', value: form },
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      })
+      if (error || !data?.success) throw new Error(data?.error || error?.message || 'Error al guardar')
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gmail-config'] })
@@ -151,10 +153,12 @@ export default function Correos() {
 
   const guardarWspConfig = useMutation({
     mutationFn: async (form) => {
-      const { error } = await supabase
-        .from('clinic_settings')
-        .upsert({ key: 'whatsapp_config', value: form, updated_at: new Date().toISOString() }, { onConflict: 'key' })
-      if (error) throw error
+      const { data: { session } } = await supabase.auth.getSession()
+      const { data, error } = await supabase.functions.invoke('save-clinic-secret', {
+        body: { key: 'whatsapp_config', value: form },
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      })
+      if (error || !data?.success) throw new Error(data?.error || error?.message || 'Error al guardar')
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['whatsapp-config'] })

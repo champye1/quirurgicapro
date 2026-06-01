@@ -409,31 +409,28 @@ serve(async (req) => {
       }
     }
 
-    // Usar la contraseña proporcionada (solo si es no vacía) o generar una aleatoria
-    const rawPassword = typeof password === 'string' ? password : ''
-    const tempPassword = rawPassword.length > 0
-      ? rawPassword
-      : (() => {
-          const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-          const digits = '0123456789'
-          const all = letters + digits
-          const bytes = new Uint8Array(12)
-          crypto.getRandomValues(bytes)
-          // Primeros 2: garantizan al menos una letra y un dígito
-          const arr = [
-            letters[bytes[0] % letters.length],
-            digits[bytes[1] % digits.length],
-            ...Array.from(bytes.slice(2), b => all[b % all.length]),
-          ]
-          // Fisher-Yates shuffle criptográfico
-          const shuffleBytes = new Uint8Array(arr.length)
-          crypto.getRandomValues(shuffleBytes)
-          for (let i = arr.length - 1; i > 0; i--) {
-            const j = shuffleBytes[i] % (i + 1)
-            ;[arr[i], arr[j]] = [arr[j], arr[i]]
-          }
-          return arr.join('')
-        })()
+    // Generar contraseña aleatoria interna — NUNCA se retorna en la respuesta.
+    // El médico accederá con un enlace de reset de contraseña enviado a su email.
+    const genPassword = (): string => {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+      const digits = '0123456789'
+      const all = letters + digits
+      const bytes = new Uint8Array(16)
+      crypto.getRandomValues(bytes)
+      const arr = [
+        letters[bytes[0] % letters.length],
+        digits[bytes[1] % digits.length],
+        ...Array.from(bytes.slice(2), (b: number) => all[b % all.length]),
+      ]
+      const shuffleBytes = new Uint8Array(arr.length)
+      crypto.getRandomValues(shuffleBytes)
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = shuffleBytes[i] % (i + 1)
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+      return arr.join('')
+    }
+    const tempPassword = genPassword()
     
     const userEmail = email
 
@@ -616,12 +613,61 @@ serve(async (req) => {
       )
     }
 
+    // Si el médico tiene acceso web, generar enlace de reset de contraseña y enviarlo por email.
+    // La contraseña temporal NUNCA se retorna — el médico la establece él mismo desde el enlace.
+    let resetLinkSent = false
+    let resetLink: string | undefined
+
+    if (acceso_web_enabled) {
+      try {
+        const appUrl = Deno.env.get('APP_URL') || 'https://clinica-unico.pages.dev'
+        const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'recovery',
+          email: userEmail,
+          options: { redirectTo: `${appUrl}/auth/restablecer-contrasena` },
+        })
+        resetLink = (linkData as Record<string, unknown>)?.properties
+          ? ((linkData as Record<string, { action_link?: string }>).properties?.action_link)
+          : undefined
+
+        if (resetLink) {
+          // Intentar enviar por email
+          const { data: settingsRow } = await supabaseAdmin
+            .from('clinic_settings').select('value').eq('key', 'gmail_config').maybeSingle()
+          const cfg = (settingsRow?.value as Record<string, string>) || {}
+          const hasGmail = !!(cfg.client_id && cfg.client_secret && cfg.refresh_token)
+
+          if (hasGmail) {
+            const html = `<h2 style="color:#1e40af">Bienvenido al Portal Clínico</h2>
+              <p>Estimado/a Dr/a. <strong>${nombre} ${apellido}</strong>,</p>
+              <p>El equipo de pabellón te ha creado una cuenta. Para ingresar, primero debes establecer tu contraseña:</p>
+              <p style="text-align:center;margin:24px 0">
+                <a href="${resetLink}" style="background:#1e40af;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">
+                  Establecer mi contraseña
+                </a>
+              </p>
+              <p style="color:#6b7280;font-size:12px">Este enlace es de un solo uso y expira en 24 horas.</p>`
+            try {
+              await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${supabaseServiceKey}` },
+                body: JSON.stringify({ to: userEmail, subject: 'Bienvenido al Portal Clínico — Establece tu contraseña', html }),
+              })
+              resetLinkSent = true
+              resetLink = undefined // No exponer el link si se envió por email
+            } catch { /* Si falla el email, el link se retorna para copia manual */ }
+          }
+        }
+      } catch { /* No bloquear la creación si falla la generación del link */ }
+    }
+
     return jsonResponse(
       {
         success: true,
         doctor: doctorData,
-        tempPassword: acceso_web_enabled ? tempPassword : undefined,
         username: acceso_web_enabled ? username : undefined,
+        resetLinkSent,
+        resetLink, // Solo presente si Gmail no está configurado (fallback para copia manual)
         message: 'Médico creado exitosamente',
       },
       200,

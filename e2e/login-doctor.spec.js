@@ -18,8 +18,8 @@ test.describe('Login doctor', () => {
     await mockAuth(page, { fail: true })
     await page.goto('/login/doctor')
 
-    await page.fill('#email', 'doctor@falso.com')
-    await page.fill('input[type="password"]', 'wrongpass')
+    await page.fill('#email', process.env.E2E_DOCTOR_EMAIL_INVALID ?? 'doctor@falso.com')
+    await page.fill('input[type="password"]', process.env.E2E_PASSWORD_INVALID ?? 'wrongpass')
     await page.click('button[type="submit"]')
 
     await expect(

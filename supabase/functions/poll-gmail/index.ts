@@ -246,14 +246,16 @@ serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    // 1. Leer credenciales: primero desde clinic_settings (BD), luego desde secrets
-    const { data: settingsRow } = await supabase
-      .from('clinic_settings')
-      .select('value')
-      .eq('key', 'gmail_config')
-      .maybeSingle()
-
-    const cfg = settingsRow?.value || {}
+    // 1. Leer credenciales: primero desde clinic_secrets (cifrado), luego clinic_settings (legacy), luego env
+    let cfg: Record<string, string> = {}
+    try {
+      const { data: secretRow } = await supabase.rpc('read_clinic_secret', { p_key: 'gmail_config' })
+      if (secretRow) cfg = JSON.parse(secretRow)
+    } catch {
+      const { data: settingsRow } = await supabase
+        .from('clinic_settings').select('value').eq('key', 'gmail_config').maybeSingle()
+      cfg = (settingsRow?.value as Record<string, string>) || {}
+    }
     const gmailClientId     = cfg.client_id     || Deno.env.get('GMAIL_CLIENT_ID')     || ''
     const gmailClientSecret = cfg.client_secret || Deno.env.get('GMAIL_CLIENT_SECRET') || ''
     const gmailRefreshToken = cfg.refresh_token || Deno.env.get('GMAIL_REFRESH_TOKEN') || ''

@@ -12,8 +12,8 @@ test.describe('Login pabellón', () => {
     await mockAuth(page, { fail: true })
     await page.goto('/login/pabellon')
 
-    await page.fill('input[type="email"], input#email', 'malo@ejemplo.com')
-    await page.fill('input[type="password"]', 'wrongpass')
+    await page.fill('input[type="email"], input#email', process.env.E2E_PABELLON_EMAIL_INVALID ?? 'malo@ejemplo.com')
+    await page.fill('input[type="password"]', process.env.E2E_PASSWORD_INVALID ?? 'wrongpass')
     await page.click('button[type="submit"]')
 
     await expect(

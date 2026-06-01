@@ -99,6 +99,19 @@ export default function Perfil() {
     setLoadingPwd(true)
     setExitoPwd(false)
     try {
+      // Re-autenticar con la contraseña actual antes de cambiarla
+      const { data: userData } = await supabase.auth.getUser()
+      const userEmail = userData?.user?.email
+      if (!userEmail) throw new Error('No se pudo obtener el email del usuario')
+
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: userEmail,
+        password: form.actual,
+      })
+      if (signInErr) {
+        throw new Error('La contraseña actual es incorrecta')
+      }
+
       const { error } = await supabase.auth.updateUser({ password: form.nueva })
       if (error) throw error
       setExitoPwd(true)
