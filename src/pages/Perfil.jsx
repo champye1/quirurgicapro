@@ -26,7 +26,7 @@ export default function Perfil() {
   const queryClient = useQueryClient()
 
   // ── Contraseña ──────────────────────────────────────────────────────────
-  const [form, setForm] = useState({ nueva: '', confirmar: '' })
+  const [form, setForm] = useState({ actual: '', nueva: '', confirmar: '' })
   const [showNueva, setShowNueva] = useState(false)
   const [showConfirmar, setShowConfirmar] = useState(false)
   const [loadingPwd, setLoadingPwd] = useState(false)
@@ -83,8 +83,10 @@ export default function Perfil() {
   // ── Contraseña ──────────────────────────────────────────────────────────
   const validarPwd = () => {
     const e = {}
+    if (!form.actual) e.actual = 'Ingrese su contraseña actual'
     if (!form.nueva) e.nueva = 'Ingrese la nueva contraseña'
     else if (form.nueva.length < 8) e.nueva = 'Mínimo 8 caracteres'
+    else if (form.actual && form.nueva === form.actual) e.nueva = 'La nueva contraseña debe ser diferente a la actual'
     if (!form.confirmar) e.confirmar = 'Confirme la contraseña'
     else if (form.nueva !== form.confirmar) e.confirmar = 'Las contraseñas no coinciden'
     setErroresPwd(e)
@@ -100,7 +102,7 @@ export default function Perfil() {
       const { error } = await supabase.auth.updateUser({ password: form.nueva })
       if (error) throw error
       setExitoPwd(true)
-      setForm({ nueva: '', confirmar: '' })
+      setForm({ actual: '', nueva: '', confirmar: '' })
       showSuccess('Contraseña actualizada exitosamente')
     } catch (err) {
       showError(`Error al cambiar contraseña: ${err.message}`)
@@ -204,6 +206,19 @@ export default function Perfil() {
         )}
 
         <form onSubmit={handleSubmitPwd} className="space-y-4" noValidate>
+          <div>
+            <label className={labelCls}>Contraseña actual</label>
+            <input
+              type="password"
+              value={form.actual}
+              onChange={e => { setForm(f => ({ ...f, actual: e.target.value })); setErroresPwd(er => ({ ...er, actual: '' })) }}
+              className={inputCls}
+              placeholder="Tu contraseña actual"
+              autoComplete="current-password"
+            />
+            {erroresPwd.actual && <p className="mt-1 text-xs text-red-600">{erroresPwd.actual}</p>}
+          </div>
+
           <div>
             <label className={labelCls}>Nueva contraseña</label>
             <div className="relative">

@@ -101,6 +101,7 @@ export default function Medicos() {
   const [showConfirmEliminar, setShowConfirmEliminar] = useState(false)
   const [showImportar, setShowImportar] = useState(false)
   const [medicoAEliminar, setMedicoAEliminar] = useState(null)
+  const [credencialesModal, setCredencialesModal] = useState(null) // { nombre, username, email, password }
   const [fieldErrors, setFieldErrors] = useState({})
   const [touchedFields, setTouchedFields] = useState({})
   const [currentPage, setCurrentPage] = useState(1)
@@ -326,8 +327,8 @@ export default function Medicos() {
       setFormData(EMPTY_FORM)
       setShowPassword(false)
       if (result.tempPassword) {
-        const detalle = `👤 Usuario: ${result.username || result.email}\n📧 Email: ${result.email}\n🔑 Contraseña: ${result.tempPassword}\n⚠️ Debe cambiar contraseña al ingresar.`
-        notifyDoctorAction('create', `${result.nombre} ${result.apellido}`, detalle)
+        // Mostrar contraseña en modal dedicado en lugar de toast (evita exposición en screenshots)
+        setCredencialesModal({ nombre: `${result.nombre} ${result.apellido}`, username: result.username || result.email, email: result.email, password: result.tempPassword })
       } else {
         notifyDoctorAction('create', `${result.nombre} ${result.apellido}`, 'Acceso web deshabilitado.')
       }
@@ -620,6 +621,29 @@ export default function Medicos() {
             showSuccess('Médicos importados correctamente')
           }}
         />
+      )}
+
+      {/* Modal de credenciales — mostrado en lugar de toast para evitar exposición en screenshots */}
+      {credencialesModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 max-w-sm w-full space-y-4">
+            <h2 className="text-lg font-black text-slate-900">Médico creado — Credenciales de acceso</h2>
+            <p className="text-sm text-slate-500">Anota estas credenciales antes de cerrar. No se mostrarán nuevamente.</p>
+            <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm font-mono">
+              <p><span className="text-slate-500">Nombre:</span> <strong>{credencialesModal.nombre}</strong></p>
+              <p><span className="text-slate-500">Usuario:</span> <strong>{credencialesModal.username}</strong></p>
+              <p><span className="text-slate-500">Email:</span> <strong>{credencialesModal.email}</strong></p>
+              <p><span className="text-slate-500">Contraseña:</span> <strong>{credencialesModal.password}</strong></p>
+            </div>
+            <p className="text-xs text-amber-600 font-semibold">⚠️ El médico debe cambiar su contraseña al ingresar por primera vez.</p>
+            <button
+              onClick={() => setCredencialesModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors"
+            >
+              Entendido, ya las anoté
+            </button>
+          </div>
+        </div>
       )}
 
       <ConfirmModal

@@ -59,7 +59,12 @@ export default function Solicitudes() {
       let query = supabase
         .from('surgery_requests')
         .select(`
-          *,
+          id, codigo_operacion, estado, motivo_rechazo, observaciones,
+          fecha_preferida, hora_recomendada, hora_fin_recomendada,
+          operating_room_id_preferido, dejar_fecha_a_pabellon,
+          fecha_preferida_2, hora_recomendada_2, hora_fin_recomendada_2,
+          operating_room_id_preferido_2, horarios_preferidos_extra,
+          created_at, updated_at, deleted_at,
           patients:patient_id(nombre, apellido, rut, telefono, prevision),
           surgery_request_supplies(
             supply_id,

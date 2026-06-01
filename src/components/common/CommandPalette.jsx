@@ -47,7 +47,7 @@ export default function CommandPalette({ isOpen, onClose, basePrefix }) {
           .is('deleted_at', null)
           .limit(4),
         supabase.from('supplies')
-          .select('id, nombre, codigo, stock_actual')
+          .select('id, nombre, codigo')
           .or(`nombre.ilike.%${termino}%,codigo.ilike.%${termino}%`)
           .is('deleted_at', null)
           .eq('activo', true)
@@ -106,7 +106,7 @@ export default function CommandPalette({ isOpen, onClose, basePrefix }) {
           items: insumos.map(i => ({
             id: `insumo-${i.id}`,
             titulo: i.nombre,
-            subtitulo: `Código: ${i.codigo} · Stock: ${i.stock_actual}`,
+            subtitulo: `Código: ${i.codigo}`,
             accion: () => { navigate(`${basePrefix}/insumos`); onClose() },
           })),
         })

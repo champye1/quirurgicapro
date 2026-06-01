@@ -287,8 +287,14 @@ export default function Correos() {
 
   const urlContacto = `${window.location.origin}/contacto`
 
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
   const enviarRespuesta = async () => {
     if (!replyModal || !replyText.trim()) return
+    if (!EMAIL_REGEX.test(replyModal.to)) {
+      showError('La dirección de email del destinatario no es válida.')
+      return
+    }
     setEnviandoReply(true)
     try {
       const html = `<p>${replyText.trim().replace(/\n/g, '<br/>')}</p>

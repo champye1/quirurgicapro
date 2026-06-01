@@ -135,15 +135,16 @@ export default function ContactoExterno() {
 
       // Email de confirmación al médico solicitante
       try {
-        const clinicaNombre = clinicInfo?.nombre || 'la clínica'
-        const clinicaTelefono = clinicInfo?.telefono || ''
+        const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        const clinicaNombre = esc(clinicInfo?.nombre || 'la clínica')
+        const clinicaTelefono = esc(clinicInfo?.telefono || '')
         const html = `
           <h2 style="color:#1e40af;margin-bottom:8px">Hemos recibido su solicitud ✅</h2>
-          <p>Estimado/a <strong>${form.nombre_remitente}</strong>,</p>
+          <p>Estimado/a <strong>${esc(form.nombre_remitente)}</strong>,</p>
           <p>Su solicitud de hora quirúrgica ha sido recibida correctamente por el equipo de ${clinicaNombre}.</p>
-          ${form.nombre_paciente ? `<p><strong>Paciente:</strong> ${form.nombre_paciente}</p>` : ''}
-          ${form.tipo_cirugia ? `<p><strong>Procedimiento:</strong> ${form.tipo_cirugia}</p>` : ''}
-          <p><strong>Urgencia:</strong> ${form.urgencia.charAt(0).toUpperCase() + form.urgencia.slice(1)}</p>
+          ${form.nombre_paciente ? `<p><strong>Paciente:</strong> ${esc(form.nombre_paciente)}</p>` : ''}
+          ${form.tipo_cirugia ? `<p><strong>Procedimiento:</strong> ${esc(form.tipo_cirugia)}</p>` : ''}
+          <p><strong>Urgencia:</strong> ${esc(form.urgencia.charAt(0).toUpperCase() + form.urgencia.slice(1))}</p>
           <hr style="margin:16px 0;border:none;border-top:1px solid #e2e8f0"/>
           <p>Nos comunicaremos con usted en un plazo de <strong>24 horas hábiles</strong> para coordinar disponibilidad horaria.</p>
           ${clinicaTelefono ? `<p>Si su caso es urgente, puede contactarnos directamente al <strong>${clinicaTelefono}</strong>.</p>` : ''}

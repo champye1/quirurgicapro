@@ -327,7 +327,7 @@ export default function Insumos() {
       grupo_prestacion: formData.grupo_prestacion,
       proveedor: (formData.proveedor || '').trim() || null,
       grupos_fonasa: (formData.grupos_fonasa || '').trim() || null,
-      stock_minimo: parseInt(formData.stock_minimo) || 10,
+      stock_minimo: Math.max(0, parseInt(formData.stock_minimo) || 0),
       unidad_medida: 'unidad',
     }
     if (insumoEditando) {

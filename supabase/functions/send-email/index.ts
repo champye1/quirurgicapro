@@ -15,9 +15,24 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const GMAIL_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GMAIL_API_BASE  = 'https://gmail.googleapis.com/gmail/v1/users/me'
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowed = Deno.env.get('ALLOWED_ORIGINS')?.split(',').map(s => s.trim()) ?? []
+  const allowOrigin = allowed.length > 0 && origin && allowed.includes(origin) ? origin : (allowed[0] ?? '*')
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
+}
+
+/** Elimina tags de script/iframe/evento del HTML para prevenir inyección */
+function sanitizeHtml(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/\bon\w+\s*=/gi, 'data-blocked=')
+    .replace(/javascript\s*:/gi, '')
 }
 
 async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string): Promise<string> {
@@ -100,6 +115,9 @@ function buildRawEmail(params: {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const CORS_HEADERS = getCorsHeaders(origin)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS })
   }
@@ -141,10 +159,11 @@ serve(async (req) => {
       return json({ error: 'Body JSON inválido' }, 400)
     }
 
-    const { to, subject, html, text } = body
-    if (!to || !subject || !html) {
+    const { to, subject, html: rawHtml, text } = body
+    if (!to || !subject || !rawHtml) {
       return json({ error: 'Faltan campos requeridos: to, subject, html' }, 400)
     }
+    const html = sanitizeHtml(rawHtml)
 
     // Validar formato de email destino
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {

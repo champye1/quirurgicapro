@@ -328,8 +328,10 @@ export default function BloqueoHorario() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Validar hora fin > hora inicio
-    if (formData.hora_fin <= formData.hora_inicio) {
+    // Normalizar a HH:MM para comparación consistente (independiente de si incluye segundos)
+    const horaIni = String(formData.hora_inicio).slice(0, 5)
+    const horaFin = String(formData.hora_fin).slice(0, 5)
+    if (horaFin <= horaIni) {
       showError('La hora de fin debe ser mayor que la hora de inicio')
       return
     }

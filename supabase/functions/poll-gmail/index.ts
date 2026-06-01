@@ -201,11 +201,19 @@ async function markAsRead(accessToken: string, messageId: string): Promise<void>
   }
 }
 
-serve(async (req) => {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowed = Deno.env.get('ALLOWED_ORIGINS')?.split(',').map(s => s.trim()) ?? []
+  const allowOrigin = allowed.length > 0 && origin && allowed.includes(origin) ? origin : (allowed[0] ?? '*')
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
   }
+}
+
+serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
