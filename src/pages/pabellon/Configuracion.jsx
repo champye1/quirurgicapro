@@ -49,11 +49,21 @@ export default function Configuracion() {
   const [exportandoContrato, setExportandoContrato] = useState(false)
   const [exportandoManual, setExportandoManual] = useState(false)
 
-  // Tablas que NO tienen columna deleted_at
-  const TABLAS_SIN_SOFT_DELETE = ['operating_rooms', 'supply_movements', 'clinic_settings']
+  // Campos permitidos por tabla (evita exponer columnas sensibles o internas)
+  const TABLA_CAMPOS = {
+    doctors:          'id, nombre, apellido, rut, email, especialidad, estado, telefono, acceso_web_enabled, created_at',
+    patients:         'id, nombre, apellido, rut, telefono, prevision, doctor_id, created_at',
+    surgery_requests: 'id, codigo_operacion, estado, fecha_preferida, observaciones, doctor_id, patient_id, created_at',
+    surgeries:        'id, fecha, hora_inicio, hora_fin, estado, operating_room_id, surgery_request_id, created_at',
+    supplies:         'id, nombre, codigo, grupo_prestacion, proveedor, stock_actual, stock_minimo, activo, created_at',
+    supply_movements: 'id, supply_id, tipo, cantidad, motivo, created_by, created_at',
+    operating_rooms:  'id, nombre, activo, created_at',
+  }
+  const TABLAS_SIN_SOFT_DELETE = ['operating_rooms', 'supply_movements']
 
   const exportarTodosCsv = async (tabla) => {
-    const query = supabase.from(tabla).select('*')
+    const campos = TABLA_CAMPOS[tabla] || 'id, created_at'
+    const query = supabase.from(tabla).select(campos)
     const { data } = TABLAS_SIN_SOFT_DELETE.includes(tabla)
       ? await query
       : await query.is('deleted_at', null)

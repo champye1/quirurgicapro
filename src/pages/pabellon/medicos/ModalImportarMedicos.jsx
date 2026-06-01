@@ -105,9 +105,12 @@ export default function ModalImportarMedicos({ onClose, onSuccess }) {
     const { data: { session } } = await supabase.auth.getSession()
     let ok = 0, fail = 0, failDetails = []
 
-    for (const row of validRows) {
-      try {
-        const { data, error } = await supabase.functions.invoke('create-doctor', {
+    // Procesar en lotes de 5 en paralelo para mayor velocidad sin saturar la API
+    const CONCURRENCY = 5
+    for (let i = 0; i < validRows.length; i += CONCURRENCY) {
+      const batch = validRows.slice(i, i + CONCURRENCY)
+      const batchResults = await Promise.allSettled(batch.map(row =>
+        supabase.functions.invoke('create-doctor', {
           body: {
             nombre: row.nombre.trim(),
             apellido: row.apellido.trim(),
@@ -120,16 +123,19 @@ export default function ModalImportarMedicos({ onClose, onSuccess }) {
           },
           headers: { Authorization: `Bearer ${session.access_token}` },
         })
-        if (error || !data?.success) {
+      ))
+      batchResults.forEach((result, idx) => {
+        const row = batch[idx]
+        if (result.status === 'rejected' || !result.value?.data?.success) {
           fail++
-          failDetails.push({ rut: formatRut(cleanRut(row.rut)), error: data?.error || error?.message || 'Error desconocido' })
+          const errMsg = result.status === 'rejected'
+            ? result.reason?.message
+            : (result.value?.data?.error || result.value?.error?.message || 'Error desconocido')
+          failDetails.push({ rut: formatRut(cleanRut(row.rut)), error: errMsg })
         } else {
           ok++
         }
-      } catch (e) {
-        fail++
-        failDetails.push({ rut: row.rut, error: e.message })
-      }
+      })
     }
 
     setImporting(false)

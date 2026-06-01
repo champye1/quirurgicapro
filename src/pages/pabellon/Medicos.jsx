@@ -87,7 +87,10 @@ const notifyDoctorAction = (type, doctorName, details = null) => {
 
 const generarUsername = (nombre, apellido) => {
   if (!nombre) return ''
-  return nombre.charAt(0).toLowerCase() + (apellido ? apellido.toLowerCase() : '')
+  const base = nombre.charAt(0).toLowerCase() + (apellido ? apellido.toLowerCase() : '')
+  // Sufijo numérico de 3 dígitos para reducir predictibilidad por enumeración
+  const suffix = String(Math.floor(100 + Math.random() * 900))
+  return base + suffix
 }
 
 export default function Medicos() {
@@ -390,8 +393,23 @@ export default function Medicos() {
     mutationFn: async ({ id, acceso_web_enabled }) => {
       const { error } = await supabase.from('doctors').update({ acceso_web_enabled }).eq('id', id)
       if (error) throw error
+      // Al deshabilitar acceso web, cambiar la contraseña a una aleatoria para invalidar la sesión activa del médico
+      if (!acceso_web_enabled) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          const randomPwd = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+            .map(b => b.toString(16).padStart(2, '0')).join('')
+          await supabase.functions.invoke('update-doctor-password', {
+            body: { doctorId: id, password: randomPwd },
+            headers: { Authorization: `Bearer ${session?.access_token}` },
+          })
+        } catch { /* No bloquear si falla la invalidación */ }
+      }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['medicos'] }),
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['medicos'] })
+      if (!vars.acceso_web_enabled) showSuccess('Acceso web deshabilitado y sesión del médico invalidada.')
+    },
     onError: (error) => {
       showError(`Error al cambiar acceso web: ${error.message || 'Error desconocido'}`)
       logger.error('Error toggleAccesoWeb:', error)
@@ -435,7 +453,7 @@ export default function Medicos() {
       queryClient.invalidateQueries({ queryKey: ['medicos'] })
       if (result.deleted) {
         showInfo(
-          `✅ Médico eliminado completamente\n\n👤 Nombre: ${result.deleted.doctor}\n📧 Email: ${result.deleted.email}\n🆔 RUT: ${result.deleted.rut}\n\nTodos los datos relacionados han sido eliminados.`
+          `✅ Médico eliminado completamente\n\n👤 Nombre: ${result.deleted.doctor}\n\nTodos los datos relacionados han sido eliminados.`
         )
       } else {
         showSuccess('Médico eliminado exitosamente')
