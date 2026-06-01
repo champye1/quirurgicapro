@@ -256,6 +256,38 @@ export default function Solicitudes() {
     }
   }
 
+  const enviarEmail = (solicitud, tipo) => {
+    const esAceptada = tipo === 'aceptada'
+    const nombreDoctor = solicitud.doctors ? `${solicitud.doctors.nombre} ${solicitud.doctors.apellido}` : null
+    const nombrePaciente = solicitud.patients ? `${solicitud.patients.nombre} ${solicitud.patients.apellido}` : null
+    const fechaCirugia = solicitud.hora_recomendada
+      ? format(new Date(solicitud.hora_recomendada), 'dd/MM/yyyy HH:mm')
+      : solicitud.fecha_preferida || null
+
+    if (solicitud.doctors?.email) {
+      const subject = esAceptada
+        ? `Cirugía programada — ${nombrePaciente || 'su paciente'}`
+        : `Solicitud rechazada — ${nombrePaciente || 'su paciente'}`
+      const html = esAceptada
+        ? `<h2 style="color:#1e40af">Solicitud de cirugía ACEPTADA ✅</h2>
+           <p>Estimado/a Dr/a. <strong>${nombreDoctor}</strong>,</p>
+           <p>Su solicitud quirúrgica ha sido <strong>aceptada y programada</strong>.</p>
+           ${nombrePaciente ? `<p><strong>Paciente:</strong> ${nombrePaciente}</p>` : ''}
+           ${fechaCirugia ? `<p><strong>Fecha programada:</strong> ${fechaCirugia}</p>` : ''}
+           ${solicitud.observaciones ? `<p><strong>Observaciones:</strong> ${solicitud.observaciones}</p>` : ''}
+           <p style="color:#6b7280;font-size:12px">Portal Clínico — Mensaje automático</p>`
+        : `<h2 style="color:#dc2626">Solicitud de cirugía RECHAZADA ❌</h2>
+           <p>Estimado/a Dr/a. <strong>${nombreDoctor}</strong>,</p>
+           <p>Su solicitud quirúrgica <strong>no pudo ser aceptada</strong> en este momento.</p>
+           ${nombrePaciente ? `<p><strong>Paciente:</strong> ${nombrePaciente}</p>` : ''}
+           ${solicitud.motivo_rechazo ? `<p><strong>Motivo:</strong> ${solicitud.motivo_rechazo}</p>` : ''}
+           <p>Para más información comuníquese directamente con el equipo de pabellón.</p>
+           <p style="color:#6b7280;font-size:12px">Portal Clínico — Mensaje automático</p>`
+      supabase.functions.invoke('send-email', { body: { to: solicitud.doctors.email, subject, html } })
+        .catch(err => logger.warn('Email al médico falló:', err?.message))
+    }
+  }
+
   const rechazarSolicitud = useMutation({
     mutationFn: async ({ solicitud, motivo }) => {
       const { error } = await supabase
@@ -277,6 +309,7 @@ export default function Solicitudes() {
       showSuccess('Solicitud rechazada')
       setRechazarModal(null)
       enviarWhatsApp(solicitud, 'rechazada')
+      enviarEmail(solicitud, 'rechazada')
     },
     onError: (error, _vars, context) => {
       if (context?.previousData) {
@@ -366,7 +399,7 @@ export default function Solicitudes() {
   })
 
   const programarCirugia = useMutation({
-    mutationFn: async ({ solicitudId, formData }) => {
+    mutationFn: async ({ solicitudId, solicitud, formData }) => {
       const { data: surgeryData, error: surgeryError } = await supabase
         .from('surgeries')
         .insert({
@@ -390,15 +423,19 @@ export default function Solicitudes() {
         await supabase.from('surgeries').delete().eq('id', surgeryData.id)
         throw requestError
       }
-      return surgeryData
+      return { surgeryData, solicitud }
     },
-    onSuccess: () => {
+    onSuccess: ({ solicitud }) => {
       queryClient.invalidateQueries({ queryKey: ['solicitudes'] })
       queryClient.invalidateQueries({ queryKey: ['solicitudes-pendientes'] })
       queryClient.invalidateQueries({ queryKey: ['cirugias-hoy'] })
       setSolicitudProgramando(null)
       setFormProgramacion({ fecha: '', hora_inicio: '', hora_fin: '', operating_room_id: '', observaciones: '' })
       showSuccess('Cirugía programada exitosamente')
+      if (solicitud) {
+        enviarWhatsApp(solicitud, 'aceptada')
+        enviarEmail(solicitud, 'aceptada')
+      }
     },
     onError: (error) => showError('Error al programar cirugía: ' + (error.message || 'Error desconocido')),
   })
@@ -429,6 +466,7 @@ export default function Solicitudes() {
       setSolicitudAceptandoHorario(null)
       showSuccess('Horario del médico aceptado y cirugía programada')
       enviarWhatsApp(solicitud, 'aceptada')
+      enviarEmail(solicitud, 'aceptada')
     },
     onError: (error) => {
       setSolicitudAceptandoHorario(null)
@@ -567,7 +605,7 @@ export default function Solicitudes() {
       const [fh, fm] = formProgramacion.hora_fin.split(':').map(Number)
       if (fh * 60 + fm <= hh * 60 + hm) { showError('La hora de fin debe ser mayor que la hora de inicio'); return }
     }
-    programarCirugia.mutate({ solicitudId: solicitudProgramando.id, formData: formProgramacion })
+    programarCirugia.mutate({ solicitudId: solicitudProgramando.id, solicitud: solicitudProgramando, formData: formProgramacion })
   }
 
   const generarEnlacePaciente = async (solicitudId) => {

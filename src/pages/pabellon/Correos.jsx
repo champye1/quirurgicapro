@@ -42,6 +42,9 @@ export default function Correos() {
   const [showWspConfig, setShowWspConfig] = useState(false)
   const [wspForm, setWspForm] = useState({ phone_number_id: '', access_token: '' })
   const [showWspSecrets, setShowWspSecrets] = useState({ phone_number_id: false, access_token: false })
+  const [replyModal, setReplyModal] = useState(null) // { to, subject, mensajeId }
+  const [replyText, setReplyText] = useState('')
+  const [enviandoReply, setEnviandoReply] = useState(false)
 
   // ──────────────── QUERY ────────────────
   const { data: mensajes = [], isLoading } = useQuery({
@@ -283,6 +286,28 @@ export default function Correos() {
   }
 
   const urlContacto = `${window.location.origin}/contacto`
+
+  const enviarRespuesta = async () => {
+    if (!replyModal || !replyText.trim()) return
+    setEnviandoReply(true)
+    try {
+      const html = `<p>${replyText.trim().replace(/\n/g, '<br/>')}</p>
+        <hr style="margin:16px 0;border:none;border-top:1px solid #e2e8f0"/>
+        <p style="color:#94a3b8;font-size:12px">Portal Clínico — Respuesta enviada desde la bandeja de correos</p>`
+      const { error } = await supabase.functions.invoke('send-email', {
+        body: { to: replyModal.to, subject: `Re: ${replyModal.subject}`, html },
+      })
+      if (error) throw error
+      showSuccess('Respuesta enviada correctamente')
+      setReplyModal(null)
+      setReplyText('')
+    } catch (err) {
+      showError('No se pudo enviar la respuesta. Verifica la configuración de Gmail.')
+      logger.warn('Error enviando reply:', err?.message)
+    } finally {
+      setEnviandoReply(false)
+    }
+  }
 
   // ──────────────── RENDER ────────────────
   return (
@@ -570,13 +595,13 @@ export default function Correos() {
                     {/* Acciones */}
                     <div className="flex flex-wrap gap-2 pt-2">
                       {m.email_remitente ? (
-                        <a
-                          href={`mailto:${m.email_remitente}?subject=Re: ${encodeURIComponent(m.asunto)}`}
+                        <button
+                          type="button"
                           className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
-                          onClick={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); setReplyModal({ to: m.email_remitente, subject: m.asunto, mensajeId: m.id }); setReplyText('') }}
                         >
                           <Mail className="w-3.5 h-3.5" /> Responder por email
-                        </a>
+                        </button>
                       ) : (
                         <span
                           className="flex items-center gap-1.5 px-3 py-2 bg-gray-200 text-gray-400 text-xs font-bold rounded-xl cursor-not-allowed"
@@ -847,6 +872,61 @@ export default function Correos() {
           <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Los mensajes recibidos aparecerán en esta bandeja marcados como "No leídos". Recibirás un indicador visual en el menú lateral.
           </p>
+        </div>
+      </Modal>
+
+      {/* Modal: responder email */}
+      <Modal
+        isOpen={!!replyModal}
+        onClose={() => { setReplyModal(null); setReplyText('') }}
+        title={`Responder a ${replyModal?.to ?? ''}`}
+      >
+        <div className="space-y-4">
+          <div>
+            <p className={`text-xs font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Asunto</p>
+            <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>
+              Re: {replyModal?.subject}
+            </p>
+          </div>
+          <div>
+            <label className={`text-xs font-bold block mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Mensaje *
+            </label>
+            <textarea
+              value={replyText}
+              onChange={e => setReplyText(sanitizeString(e.target.value))}
+              rows={6}
+              maxLength={3000}
+              placeholder="Escriba su respuesta aquí..."
+              className={`w-full px-4 py-3 rounded-xl border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isDark ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800 placeholder-slate-400'
+              }`}
+            />
+            <p className={`text-xs text-right mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{replyText.length}/3000</p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => { setReplyModal(null); setReplyText('') }}
+              className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={enviandoReply || !replyText.trim()}
+              onClick={enviarRespuesta}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50"
+            >
+              {enviandoReply ? (
+                <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enviando...</>
+              ) : (
+                <><Mail className="w-3.5 h-3.5" />Enviar respuesta</>
+              )}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
