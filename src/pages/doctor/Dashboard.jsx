@@ -19,7 +19,6 @@ const descargarICS = (cirugias) => {
     const fecha = c.fecha?.replace(/-/g, '') // YYYYMMDD
     const hi = (c.hora_inicio || '08:00:00').replace(/:/g, '').slice(0, 6) // HHMMSS
     const hf = (c.hora_fin || '09:00:00').replace(/:/g, '').slice(0, 6)
-    const nombre = `${c.patients?.nombre || ''} ${c.patients?.apellido || ''}`.trim()
     lineas.push(
       'BEGIN:VEVENT',
       `DTSTART;TZID=America/Santiago:${fecha}T${hi}`,

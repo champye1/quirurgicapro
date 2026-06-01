@@ -34,9 +34,10 @@ export default defineConfig({
         runtimeCaching: [
           {
             // Solo cachear assets estáticos de Supabase Storage, NO las APIs REST/Auth
-            // para evitar que datos de sesión de un usuario queden cacheados para otro
+            // para evitar que datos de sesión de un usuario queden cacheados para otro.
+            // NetworkFirst con timeout: intenta red primero, cae a caché si no hay respuesta en 10s
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'supabase-storage-cache',
               networkTimeoutSeconds: 10,

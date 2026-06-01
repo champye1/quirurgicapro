@@ -8,6 +8,13 @@ module.exports = {
     'plugin:react-hooks/recommended',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
+  overrides: [
+    {
+      // Los tests E2E de Playwright corren en Node.js — process está disponible
+      files: ['e2e/**/*.js', 'e2e/**/*.ts'],
+      env: { node: true },
+    },
+  ],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],

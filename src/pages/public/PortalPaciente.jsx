@@ -51,7 +51,7 @@ export default function PortalPaciente() {
         if (isMounted) setLoading(false)
       }
     }
-    const TOKEN_REGEX = /^[a-zA-Z0-9_\-]{8,128}$/
+    const TOKEN_REGEX = /^[a-zA-Z0-9_-]{8,128}$/
     if (token && TOKEN_REGEX.test(token)) fetchData()
     else { setError('Enlace inválido o malformado'); setLoading(false) }
     return () => { isMounted = false }

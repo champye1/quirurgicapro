@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
 import { Search, User, FileText, Users, Package, X } from 'lucide-react'
 import { useDebounce } from '../../hooks/useDebounce'
-import { formatRut } from '../../utils/rutFormatter'
 
 // Resultados agrupados con navegación por teclado
 export default function CommandPalette({ isOpen, onClose, basePrefix }) {
