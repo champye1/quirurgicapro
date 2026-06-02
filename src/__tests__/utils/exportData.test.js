@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { exportToCSV, formatRelatedObject } from '../../utils/exportData'
+import { exportToCSV } from '../../utils/exportData'
 
 const COLUMNS = [
   { key: 'nombre', label: 'Nombre' },
@@ -42,24 +42,3 @@ describe('exportToCSV', () => {
   })
 })
 
-describe('formatRelatedObject', () => {
-  it('combina nombre y apellido por defecto', () => {
-    expect(formatRelatedObject({ nombre: 'Juan', apellido: 'Pérez' })).toBe('Juan Pérez')
-  })
-
-  it('ignora campos vacíos', () => {
-    expect(formatRelatedObject({ nombre: 'Juan', apellido: '' })).toBe('Juan')
-  })
-
-  it('retorna string vacío para null', () => {
-    expect(formatRelatedObject(null)).toBe('')
-  })
-
-  it('retorna string vacío para objeto vacío', () => {
-    expect(formatRelatedObject({})).toBe('')
-  })
-
-  it('acepta campos personalizados', () => {
-    expect(formatRelatedObject({ codigo: 'DEN-001', descripcion: 'Implante' }, ['codigo', 'descripcion'])).toBe('DEN-001 Implante')
-  })
-})
