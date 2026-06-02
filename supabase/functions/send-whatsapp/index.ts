@@ -42,7 +42,7 @@ serve(async (req) => {
     if (!phoneNumberId || !accessToken) {
       return new Response(JSON.stringify({
         error: 'WhatsApp no configurado. Ve a Configuración → WhatsApp e ingresa las credenciales.',
-      }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     // Verificar que el llamador sea un usuario pabellón autenticado

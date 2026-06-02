@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { throwIfError, handleMutationError } from '../../utils/errorHandler'
+import { handleMutationError } from '../../utils/errorHandler'
 
 vi.mock('../../config/supabase', () => ({
   supabase: {
@@ -15,22 +15,6 @@ vi.mock('../../utils/logger', () => ({
     debug: vi.fn(),
   },
 }))
-
-describe('throwIfError', () => {
-  it('does nothing when error is null', () => {
-    expect(() => throwIfError(null)).not.toThrow()
-  })
-
-  it('throws when error is a Supabase PostgrestError', () => {
-    const err = { message: 'relation not found', code: '42P01', details: '', hint: '' }
-    expect(() => throwIfError(err)).toThrow()
-  })
-
-  it('throws the exact error object', () => {
-    const err = { message: 'not authorized', code: '42501', details: '', hint: '' }
-    expect(() => throwIfError(err)).toThrowError(expect.objectContaining({ message: 'not authorized' }))
-  })
-})
 
 describe('handleMutationError', () => {
   const showError = vi.fn()

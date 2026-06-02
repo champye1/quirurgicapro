@@ -5,6 +5,7 @@ import { supabase } from '../../config/supabase'
 import { useSaveClinicInfo } from '../../hooks/useClinicInfo'
 import { useQueryClient } from '@tanstack/react-query'
 import { sanitizeString } from '../../utils/sanitizeInput'
+import { logger } from '../../utils/logger'
 import LoadingSpinner from '../common/LoadingSpinner'
 
 const STEPS = [
@@ -76,7 +77,7 @@ export default function OnboardingWizard({ onComplete }) {
       setStep(3)
     } catch (e) {
       // Mostrar error pero no bloquear — el usuario puede continuar y agregar pabellones después
-      console.error('Error al crear pabellones:', e.message)
+      logger.errorWithContext('Error al crear pabellones', e)
       setStep(3)
     } finally {
       setSaving(false)

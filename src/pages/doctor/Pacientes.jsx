@@ -43,11 +43,12 @@ export default function Pacientes() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return []
-      const { data: doctor } = await supabase
+      const { data: doctor, error: doctorError } = await supabase
         .from('doctors')
         .select('id')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
+      if (doctorError) throw doctorError
       if (!doctor) return []
       const { data, error } = await supabase
         .from('patients')

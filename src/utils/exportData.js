@@ -682,16 +682,6 @@ export async function exportToExcel(data, columns, filename = 'export') {
   triggerDownload(blob, `${filename}_${today()}.xlsx`)
 }
 
-/**
- * Formatea un objeto relacionado para exportación
- * @param {Object} obj
- * @param {string[]} fields
- */
-export function formatRelatedObject(obj, fields = ['nombre', 'apellido']) {
-  if (!obj || typeof obj !== 'object') return ''
-  return fields.map(field => obj[field] || '').filter(Boolean).join(' ')
-}
-
 // ── Helpers internos ────────────────────────────────────────────────────────
 
 function today() {

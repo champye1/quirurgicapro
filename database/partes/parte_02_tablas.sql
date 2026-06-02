@@ -271,7 +271,9 @@ CREATE TABLE IF NOT EXISTS public.notifications (
         'bloqueo_creado',
         'recordatorio',
         'solicitud_reagendamiento',
-        'operacion_reagendada'
+        'operacion_reagendada',
+        'solicitud_cancelada',
+        'orden_sin_agendar'
     )),
     titulo TEXT NOT NULL,
     mensaje TEXT NOT NULL,

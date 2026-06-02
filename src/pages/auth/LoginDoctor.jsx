@@ -119,11 +119,9 @@ export default function LoginDoctor() {
       if (userData.role === 'pabellon') {
         setError('Tienes que ingresar como Pabellón')
         setLoading(false)
-        // Cerrar sesión después de mostrar el error
-        setTimeout(async () => {
-          await supabase.auth.signOut()
-          sessionStorage.removeItem('validating_login')
-        }, 100)
+        sessionStorage.removeItem('validating_login')
+        // Fire-and-forget: no bloquea la UI pero garantiza que el signOut se ejecute
+        void supabase.auth.signOut()
         return
       }
 

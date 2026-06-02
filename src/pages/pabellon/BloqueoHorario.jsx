@@ -159,7 +159,7 @@ export default function BloqueoHorario() {
           if (c.doctors?.user_id) {
             const { error: notifErr } = await supabase.from('notifications').insert({
               user_id: c.doctors.user_id,
-              tipo: 'bloqueo_horario',
+              tipo: 'bloqueo_creado',
               titulo: 'Bloqueo de horario en tu pabellón',
               mensaje: `Se bloqueó el pabellón el ${String(data.fecha).substring(0,10)} de ${bloqueoIni.slice(0,5)} a ${bloqueoFin.slice(0,5)}${data.motivo ? ` (${sanitizeString(String(data.motivo)).substring(0, 100)})` : ''}. Tu cirugía de ${sanitizeString(String(c.patients?.nombre || ''))} ${sanitizeString(String(c.patients?.apellido || ''))} podría verse afectada.`,
               relacionado_con: c.id,

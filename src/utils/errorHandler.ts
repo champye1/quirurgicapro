@@ -1,14 +1,5 @@
-import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '../config/supabase'
 import { logger } from './logger'
-
-/**
- * Lanza el error de Supabase para que TanStack Query lo capture con isError.
- * Usar en queryFn para queries principales (sin refetchInterval).
- */
-export function throwIfError(error: PostgrestError | null): void {
-  if (error) throw error
-}
 
 /**
  * Maneja errores de autenticación y red de forma consistente.

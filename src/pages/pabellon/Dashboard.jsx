@@ -234,12 +234,16 @@ export default function Dashboard() {
       if (error) throw error
       if (!cirugias || cirugias.length === 0) return 0
 
-      const tiempos = cirugias.map(c => {
-        const inicio = new Date(`2000-01-01T${c.hora_inicio}`)
-        const fin = new Date(`2000-01-01T${c.hora_fin}`)
-        return (fin - inicio) / (1000 * 60) // minutos
-      })
+      const tiempos = cirugias
+        .filter(c => c.hora_inicio && c.hora_fin)
+        .map(c => {
+          const inicio = new Date(`2000-01-01T${c.hora_inicio}`)
+          const fin = new Date(`2000-01-01T${c.hora_fin}`)
+          return (fin - inicio) / (1000 * 60)
+        })
+        .filter(m => m > 0)
 
+      if (tiempos.length === 0) return 0
       return Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length)
     },
   })
@@ -1069,14 +1073,15 @@ export default function Dashboard() {
           <div className="mt-4 pt-4 border-t border-slate-200 flex justify-end">
             <button
               onClick={() => {
+                const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 const fecha = format(new Date(), "d 'de' MMMM yyyy", { locale: es })
                 const filas = cirugiasHoy.map(c =>
                   `<tr>
-                    <td>${c.hora_inicio || '—'}–${c.hora_fin || '—'}</td>
-                    <td>${c.patients?.nombre || ''} ${c.patients?.apellido || ''}</td>
-                    <td>${c.operating_rooms?.nombre || '—'}</td>
-                    <td>Dr. ${c.doctors?.nombre || ''} ${c.doctors?.apellido || ''}</td>
-                    <td>${c.estado}</td>
+                    <td>${esc(c.hora_inicio || '—')}–${esc(c.hora_fin || '—')}</td>
+                    <td>${esc(c.patients?.nombre || '')} ${esc(c.patients?.apellido || '')}</td>
+                    <td>${esc(c.operating_rooms?.nombre || '—')}</td>
+                    <td>Dr. ${esc(c.doctors?.nombre || '')} ${esc(c.doctors?.apellido || '')}</td>
+                    <td>${esc(c.estado)}</td>
                   </tr>`
                 ).join('')
                 const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">

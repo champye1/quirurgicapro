@@ -42,6 +42,8 @@ export default function Correos() {
   const [showWspConfig, setShowWspConfig] = useState(false)
   const [wspForm, setWspForm] = useState({ phone_number_id: '', access_token: '' })
   const [showWspSecrets, setShowWspSecrets] = useState({ phone_number_id: false, access_token: false })
+  const [showGmailTutorial, setShowGmailTutorial] = useState(false)
+  const [showWspTutorial, setShowWspTutorial] = useState(false)
   const [replyModal, setReplyModal] = useState(null) // { to, subject, mensajeId }
   const [replyText, setReplyText] = useState('')
   const [enviandoReply, setEnviandoReply] = useState(false)
@@ -664,14 +666,61 @@ export default function Correos() {
       {/* Modal: configuración Gmail */}
       <Modal
         isOpen={showGmailConfig}
-        onClose={() => setShowGmailConfig(false)}
+        onClose={() => { setShowGmailConfig(false); setShowGmailTutorial(false) }}
         title="Configurar integración Gmail"
       >
-        <div className="space-y-4">
-          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Ingresa las credenciales de la cuenta de Gmail que recibirá los correos de médicos externos.
-            Necesitas un proyecto en Google Cloud con la API de Gmail habilitada.
-          </p>
+        <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+
+          {/* Tutorial desplegable */}
+          <button
+            type="button"
+            onClick={() => setShowGmailTutorial(v => !v)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-black uppercase tracking-wider transition-colors ${
+              isDark ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+            }`}
+          >
+            <span>¿Cómo obtener estas credenciales? — Tutorial paso a paso</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showGmailTutorial ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showGmailTutorial && (
+            <div className={`rounded-xl border p-4 space-y-3 text-xs ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+              <p className="font-black uppercase tracking-wider text-blue-500">Parte 1 — Google Cloud Console</p>
+              <ol className="space-y-2 list-none">
+                {[
+                  <>Ve a <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline font-bold">console.cloud.google.com</a> e inicia sesión con la cuenta de Gmail de la clínica.</>,
+                  <>Crea un proyecto nuevo: haz clic en el selector de proyectos (arriba a la izquierda) → <strong>Proyecto nuevo</strong> → ponle un nombre (ej. "Clínica Portal") → <strong>Crear</strong>.</>,
+                  <>Con el proyecto seleccionado, ve a <strong>APIs y Servicios → Biblioteca</strong>. Busca <strong>"Gmail API"</strong> y haz clic en <strong>Habilitar</strong>.</>,
+                  <>Ve a <strong>APIs y Servicios → Credenciales → Crear credenciales → ID de cliente de OAuth</strong>.</>,
+                  <>Si te pide configurar la "Pantalla de consentimiento OAuth", elige <strong>Externo</strong>, completa el nombre de la app y tu email, y guarda.</>,
+                  <>En tipo de aplicación elige <strong>Aplicación web</strong>. En <strong>URIs de redireccionamiento autorizados</strong> agrega: <code className={`px-1 rounded text-[10px] ${isDark ? 'bg-slate-700' : 'bg-white border border-slate-200'}`}>https://developers.google.com/oauthplayground</code></>,
+                  <>Haz clic en <strong>Crear</strong>. Copia el <strong>Client ID</strong> y el <strong>Client Secret</strong> que aparecen.</>,
+                ].map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isDark ? 'bg-blue-800 text-blue-200' : 'bg-blue-100 text-blue-700'}`}>{i+1}</span>
+                    <span className="leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <p className="font-black uppercase tracking-wider text-blue-500 pt-2">Parte 2 — Obtener el Refresh Token</p>
+              <ol className="space-y-2 list-none">
+                {[
+                  <>Ve a <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline font-bold">developers.google.com/oauthplayground</a>.</>,
+                  <>Haz clic en el ícono de engranaje <strong>(⚙)</strong> arriba a la derecha. Marca <strong>"Use your own OAuth credentials"</strong> e ingresa tu Client ID y Client Secret. Cierra el panel.</>,
+                  <>En el panel izquierdo, busca <strong>"Gmail API v1"</strong> y selecciona el scope <strong>https://mail.google.com/</strong>. Haz clic en <strong>Authorize APIs</strong>.</>,
+                  <>Inicia sesión con la cuenta Gmail de la clínica y acepta todos los permisos.</>,
+                  <>Haz clic en <strong>"Exchange authorization code for tokens"</strong>. Copia el valor de <strong>Refresh token</strong>.</>,
+                ].map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isDark ? 'bg-blue-800 text-blue-200' : 'bg-blue-100 text-blue-700'}`}>{i+1}</span>
+                    <span className="leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className={`text-[10px] font-bold mt-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Tiempo estimado: 15–20 minutos la primera vez.</p>
+            </div>
+          )}
 
           {/* Email */}
           <div>
@@ -692,7 +741,7 @@ export default function Correos() {
           {/* Client ID */}
           <div>
             <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Client ID
+              Client ID <span className={`normal-case font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(paso 7 parte 1)</span>
             </label>
             <div className="relative">
               <input
@@ -714,7 +763,7 @@ export default function Correos() {
           {/* Client Secret */}
           <div>
             <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Client Secret
+              Client Secret <span className={`normal-case font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(paso 7 parte 1)</span>
             </label>
             <div className="relative">
               <input
@@ -736,7 +785,7 @@ export default function Correos() {
           {/* Refresh Token */}
           <div>
             <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Refresh Token
+              Refresh Token <span className={`normal-case font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(paso 5 parte 2)</span>
             </label>
             <div className="relative">
               <input
@@ -755,14 +804,10 @@ export default function Correos() {
             </div>
           </div>
 
-          <div className={`text-[10px] p-3 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
-            Para obtener estas credenciales: Google Cloud Console → APIs → Gmail API → Credenciales → OAuth 2.0.
-          </div>
-
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={() => setShowGmailConfig(false)}
+              onClick={() => { setShowGmailConfig(false); setShowGmailTutorial(false) }}
               className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
                 isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
@@ -784,18 +829,65 @@ export default function Correos() {
       {/* Modal: configuración WhatsApp */}
       <Modal
         isOpen={showWspConfig}
-        onClose={() => setShowWspConfig(false)}
+        onClose={() => { setShowWspConfig(false); setShowWspTutorial(false) }}
         title="Configurar WhatsApp Business"
       >
-        <div className="space-y-4">
-          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Ingresa las credenciales de tu app de Meta para enviar notificaciones por WhatsApp.
-            Necesitas una cuenta en Meta for Developers con el producto WhatsApp habilitado.
-          </p>
+        <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+
+          {/* Tutorial desplegable */}
+          <button
+            type="button"
+            onClick={() => setShowWspTutorial(v => !v)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-black uppercase tracking-wider transition-colors ${
+              isDark ? 'bg-green-900/20 border-green-800 text-green-300 hover:bg-green-900/40' : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
+            }`}
+          >
+            <span>¿Cómo obtener estas credenciales? — Tutorial paso a paso</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showWspTutorial ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showWspTutorial && (
+            <div className={`rounded-xl border p-4 space-y-3 text-xs ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+              <p className="font-black uppercase tracking-wider text-green-500">Parte 1 — Crear la App en Meta</p>
+              <ol className="space-y-2 list-none">
+                {[
+                  <>Ve a <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="text-green-500 underline font-bold">developers.facebook.com</a> e inicia sesión con tu cuenta de Facebook.</>,
+                  <>Haz clic en <strong>Mis Apps → Crear App</strong>. Selecciona el tipo <strong>Empresa</strong> y haz clic en Siguiente.</>,
+                  <>Ponle un nombre a la app (ej. "Clínica Notificaciones") y completa el resto. Haz clic en <strong>Crear App</strong>.</>,
+                  <>En el panel de tu app, busca <strong>Agregar productos</strong> y haz clic en <strong>Configurar</strong> en el producto <strong>WhatsApp</strong>.</>,
+                  <>Te pedirá vincular una cuenta de <strong>Meta Business</strong>. Si no tienes una, créala en <a href="https://business.facebook.com" target="_blank" rel="noopener noreferrer" className="text-green-500 underline font-bold">business.facebook.com</a>.</>,
+                ].map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isDark ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-700'}`}>{i+1}</span>
+                    <span className="leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <p className="font-black uppercase tracking-wider text-green-500 pt-2">Parte 2 — Obtener Phone Number ID y Access Token</p>
+              <ol className="space-y-2 list-none">
+                {[
+                  <>En el panel lateral, ve a <strong>WhatsApp → Configuración de API</strong>.</>,
+                  <>Ahí verás el <strong>Phone Number ID</strong> — cópialo y pégalo en el campo de abajo.</>,
+                  <>Debajo encontrarás un <strong>Access Token temporal</strong> (expira en 24 horas, solo para pruebas).</>,
+                  <>Para un <strong>Access Token permanente</strong> (recomendado para producción): ve a <strong>Configuración del sistema → Usuarios del sistema → Agregar</strong>. Crea un usuario con rol <strong>Administrador</strong>, luego haz clic en <strong>Generar token</strong>, selecciona tu app y los permisos <strong>whatsapp_business_messaging</strong> y <strong>whatsapp_business_management</strong>.</>,
+                  <>Copia el token generado y pégalo en el campo Access Token de abajo.</>,
+                ].map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isDark ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-700'}`}>{i+1}</span>
+                    <span className="leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className={`text-[10px] font-bold mt-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                Importante: para enviar mensajes a números reales necesitas que Meta apruebe tu cuenta Business (proceso de 1–3 días). En pruebas solo puedes enviar a números agregados como testers.
+              </p>
+            </div>
+          )}
 
           <div>
             <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Phone Number ID
+              Phone Number ID <span className={`normal-case font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(paso 2 parte 2)</span>
             </label>
             <div className="relative">
               <input
@@ -816,7 +908,7 @@ export default function Correos() {
 
           <div>
             <label className={`block text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Access Token
+              Access Token <span className={`normal-case font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>(paso 4–5 parte 2)</span>
             </label>
             <div className="relative">
               <input
@@ -835,14 +927,10 @@ export default function Correos() {
             </div>
           </div>
 
-          <div className={`text-[10px] p-3 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-green-50 border-green-100 text-green-700'}`}>
-            Meta for Developers → Tu App → WhatsApp → API Setup → Phone Number ID y Access Token.
-          </div>
-
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={() => setShowWspConfig(false)}
+              onClick={() => { setShowWspConfig(false); setShowWspTutorial(false) }}
               className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
                 isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}

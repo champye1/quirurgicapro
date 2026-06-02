@@ -69,7 +69,6 @@ export default function Estadisticas() {
         .from('supplies')
         .select('nombre, codigo, stock_actual, stock_minimo')
         .is('deleted_at', null)
-        .filter('stock_actual', 'lte', 'stock_minimo')
       if (error) throw error
       return (data || []).filter(i => i.stock_minimo > 0 && i.stock_actual <= i.stock_minimo)
     },

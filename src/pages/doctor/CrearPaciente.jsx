@@ -115,7 +115,7 @@ export default function CrearPaciente() {
         .from('doctors')
         .select('id, estado, nombre, apellido')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
       if (error) throw error
       return data
     },

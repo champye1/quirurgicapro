@@ -39,6 +39,12 @@ export default function PortalPaciente() {
 
   useEffect(() => {
     let isMounted = true
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        setError('La solicitud tardó demasiado. Por favor recarga la página.')
+        setLoading(false)
+      }
+    }, 30000)
     const fetchData = async () => {
       try {
         const { data: result, error: rpcError } = await supabase
@@ -48,13 +54,14 @@ export default function PortalPaciente() {
       } catch (err) {
         if (isMounted) setError(err.message || 'Error al cargar la información')
       } finally {
+        clearTimeout(timeoutId)
         if (isMounted) setLoading(false)
       }
     }
     const TOKEN_REGEX = /^[a-zA-Z0-9_-]{8,128}$/
     if (token && TOKEN_REGEX.test(token)) fetchData()
-    else { setError('Enlace inválido o malformado'); setLoading(false) }
-    return () => { isMounted = false }
+    else { clearTimeout(timeoutId); setError('Enlace inválido o malformado'); setLoading(false) }
+    return () => { isMounted = false; clearTimeout(timeoutId) }
   }, [token])
 
   if (loading) {

@@ -25,7 +25,7 @@ import ModalBulkRechazar from './solicitudes/ModalBulkRechazar'
 export default function Solicitudes() {
   const { theme } = useTheme()
   const navigate = useNavigate()
-  const { showSuccess, showError } = useNotifications()
+  const { showSuccess, showError, showInfo } = useNotifications()
   const queryClient = useQueryClient()
   const scrollYRef = useRef(0)
 
@@ -58,6 +58,9 @@ export default function Solicitudes() {
 
   const [seleccionados, setSeleccionados] = useState(new Set())
 
+  // Limpiar selección cuando cambia el filtro de estado
+  useEffect(() => { setSeleccionados(new Set()) }, [filtroEstado, filtroDoctor, filtroPrevision])
+
   // Enlace paciente
   const [generandoEnlace, setGenerandoEnlace] = useState(false)
   const [enlaceCopiadoId, setEnlaceCopiadoId] = useState(null)
@@ -76,9 +79,15 @@ export default function Solicitudes() {
           sessionStorage.removeItem('slot_seleccionado')
           return
         }
+        const parsedDate = slot.date ? new Date(slot.date) : null
+        if (!parsedDate || isNaN(parsedDate.getTime()) || typeof slot.time !== 'string') {
+          sessionStorage.removeItem('solicitud_gestionando')
+          sessionStorage.removeItem('slot_seleccionado')
+          return
+        }
         setSolicitudProgramando(solicitud)
         setFormProgramacion({
-          fecha: format(new Date(slot.date), 'yyyy-MM-dd'),
+          fecha: format(parsedDate, 'yyyy-MM-dd'),
           hora_inicio: slot.time,
           hora_fin: '',
           operating_room_id: slot.pabellonId,
@@ -255,15 +264,15 @@ export default function Solicitudes() {
     }
     if (solicitud.doctors?.telefono) {
       supabase.functions.invoke('send-whatsapp', { body: { ...payload, to: solicitud.doctors.telefono, destinatario: 'doctor' } })
-        .catch(err => logger.warn('WhatsApp al médico falló:', err?.message))
+        .catch(err => { logger.warn('WhatsApp al médico falló:', err?.message); showInfo('No se pudo enviar WhatsApp al médico.') })
     }
     if (solicitud.patients?.telefono) {
       supabase.functions.invoke('send-whatsapp', { body: { ...payload, to: solicitud.patients.telefono, destinatario: 'paciente' } })
-        .catch(err => logger.warn('WhatsApp al paciente falló:', err?.message))
+        .catch(err => { logger.warn('WhatsApp al paciente falló:', err?.message); showInfo('No se pudo enviar WhatsApp al paciente.') })
     }
   }
 
-  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 
   const enviarEmail = (solicitud, tipo) => {
     const esAceptada = tipo === 'aceptada'
@@ -293,7 +302,7 @@ export default function Solicitudes() {
            <p>Para más información comuníquese directamente con el equipo de pabellón.</p>
            <p style="color:#6b7280;font-size:12px">Portal Clínico — Mensaje automático</p>`
       supabase.functions.invoke('send-email', { body: { to: solicitud.doctors.email, subject, html } })
-        .catch(err => logger.warn('Email al médico falló:', err?.message))
+        .catch(err => { logger.warn('Email al médico falló:', err?.message); showInfo('No se pudo enviar el email al médico.') })
     }
   }
 
@@ -314,7 +323,7 @@ export default function Solicitudes() {
       )
       return { previousData }
     },
-    onSuccess: ({ solicitud }) => {
+    onSuccess: (solicitud) => {
       showSuccess('Solicitud rechazada')
       setRechazarModal(null)
       enviarWhatsApp(solicitud, 'rechazada')
@@ -396,13 +405,14 @@ export default function Solicitudes() {
         .in('id', ids)
         .eq('estado', 'pendiente')
       if (error) throw error
+      return ids.length
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ['solicitudes'] })
       queryClient.invalidateQueries({ queryKey: ['solicitudes-pendientes'] })
       setBulkModal(null)
       setSeleccionados(new Set())
-      showSuccess(`${seleccionados.size} solicitudes rechazadas`)
+      showSuccess(`${count} solicitud${count !== 1 ? 'es' : ''} rechazada${count !== 1 ? 's' : ''}`)
     },
     onError: (error) => showError('Error al rechazar: ' + (error.message || 'Error desconocido')),
   })
@@ -428,8 +438,10 @@ export default function Solicitudes() {
         .update({ estado: 'aceptada', updated_at: new Date().toISOString() })
         .eq('id', solicitudId)
       if (requestError) {
-        // Rollback: eliminar la cirugía recién creada para evitar registro huérfano
-        await supabase.from('surgeries').delete().eq('id', surgeryData.id)
+        // Rollback: soft-delete la cirugía recién creada para evitar registro huérfano
+        await supabase.from('surgeries')
+          .update({ deleted_at: new Date().toISOString() })
+          .eq('id', surgeryData.id)
         throw requestError
       }
       return { surgeryData, solicitud }
@@ -506,14 +518,18 @@ export default function Solicitudes() {
           .update({ deleted_at: new Date().toISOString() })
           .in('id', oldSurgeries.map(s => s.id))
       }
-      const { error: notifError } = await supabase.from('notifications').insert({
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        tipo: 'operacion_reagendada',
-        titulo: 'Cirugía reagendada',
-        mensaje: 'La cirugía fue reagendada con el horario propuesto por el médico.',
-        relacionado_con: solicitudId,
-      })
-      if (notifError) logger.warn('No se pudo crear notificación de reagendamiento:', notifError)
+      const { data: authData } = await supabase.auth.getUser()
+      const currentUserId = authData?.user?.id
+      if (currentUserId) {
+        const { error: notifError } = await supabase.from('notifications').insert({
+          user_id: currentUserId,
+          tipo: 'operacion_reagendada',
+          titulo: 'Cirugía reagendada',
+          mensaje: 'La cirugía fue reagendada con el horario propuesto por el médico.',
+          relacionado_con: solicitudId,
+        })
+        if (notifError) logger.warn('No se pudo crear notificación de reagendamiento:', notifError)
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitudes'] })

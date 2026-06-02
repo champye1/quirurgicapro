@@ -10,7 +10,7 @@ import { useNotifications } from './useNotifications'
  */
 export function useRealtimeNotifications(userId, doctorId = null) {
   const queryClient = useQueryClient()
-  const { showSuccess, showInfo } = useNotifications()
+  const { showInfo } = useNotifications()
 
   useEffect(() => {
     if (!userId) return
@@ -89,5 +89,5 @@ export function useRealtimeNotifications(userId, doctorId = null) {
       supabase.removeChannel(requestsChannel)
       supabase.removeChannel(surgeriesChannel)
     }
-  }, [userId, doctorId, queryClient, showSuccess, showInfo])
+  }, [userId, doctorId, queryClient, showInfo])
 }

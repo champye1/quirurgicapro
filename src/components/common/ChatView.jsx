@@ -74,12 +74,16 @@ export default function ChatView({ senderRole, surgeryRequestId = null }) {
     if (!contenido || sending) return
     setSending(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user) throw new Error('Sesión expirada. Por favor recarga la página.')
+      // Re-validar texto tras el await (puede haberse vaciado)
+      const contenidoFinal = texto.trim()
+      if (!contenidoFinal) { setSending(false); return }
       const { error } = await supabase.from('chat_messages').insert({
         sender_id: user.id,
         sender_role: senderRole,
         surgery_request_id: surgeryRequestId,
-        contenido,
+        contenido: contenidoFinal,
       })
       if (error) throw error
       setTexto('')

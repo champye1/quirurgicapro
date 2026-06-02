@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
 import { Lock, Stethoscope, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { sanitizePassword } from '../../utils/sanitizeInput'
+import { logger } from '../../utils/logger'
 
 export default function RestablecerContraseña() {
   const [password, setPassword] = useState('')
@@ -71,7 +72,7 @@ export default function RestablecerContraseña() {
       const { error: signOutError } = await supabase.auth.signOut()
       if (signOutError) {
         // La contraseña ya fue cambiada — navegar igual aunque falle el cierre de sesión
-        console.warn('signOut tras cambio de contraseña falló:', signOutError.message)
+        logger.warn('signOut tras cambio de contraseña falló:', signOutError.message)
       }
       navigate('/login/doctor', { replace: true })
     } catch (err) {

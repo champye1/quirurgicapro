@@ -127,7 +127,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      return json({ error: 'Faltan variables de entorno de Supabase' }, 500)
+      return json({ error: 'Faltan variables de entorno de Supabase' }, 500, CORS_HEADERS)
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
@@ -150,7 +150,7 @@ serve(async (req) => {
     const gmailEmail        = cfg.email         || Deno.env.get('GMAIL_FROM_EMAIL')    || ''
 
     if (!gmailClientId || !gmailClientSecret || !gmailRefreshToken || !gmailEmail) {
-      return json({ error: 'Gmail no configurado. Ve a Correos → Configurar Gmail.' }, 500)
+      return json({ error: 'Gmail no configurado. Ve a Correos → Configurar Gmail.' }, 500, CORS_HEADERS)
     }
 
     // Validar body
@@ -158,18 +158,18 @@ serve(async (req) => {
     try {
       body = await req.json()
     } catch {
-      return json({ error: 'Body JSON inválido' }, 400)
+      return json({ error: 'Body JSON inválido' }, 400, CORS_HEADERS)
     }
 
     const { to, subject, html: rawHtml, text } = body
     if (!to || !subject || !rawHtml) {
-      return json({ error: 'Faltan campos requeridos: to, subject, html' }, 400)
+      return json({ error: 'Faltan campos requeridos: to, subject, html' }, 400, CORS_HEADERS)
     }
     const html = sanitizeHtml(rawHtml)
 
     // Validar formato de email destino
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
-      return json({ error: 'Dirección de destino inválida' }, 400)
+      return json({ error: 'Dirección de destino inválida' }, 400, CORS_HEADERS)
     }
 
     const accessToken = await getAccessToken(gmailClientId, gmailClientSecret, gmailRefreshToken)
@@ -212,17 +212,17 @@ serve(async (req) => {
     }
 
     const data = await res.json()
-    return json({ success: true, messageId: data.id })
+    return json({ success: true, messageId: data.id }, 200, CORS_HEADERS)
 
   } catch (error) {
     console.error('Error en send-email:', error)
-    return json({ error: error instanceof Error ? error.message : 'Error desconocido' }, 500)
+    return json({ error: error instanceof Error ? error.message : 'Error desconocido' }, 500, CORS_HEADERS)
   }
 })
 
-function json(data: unknown, status = 200): Response {
+function json(data: unknown, status = 200, cors: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    headers: { ...cors, 'Content-Type': 'application/json' },
   })
 }

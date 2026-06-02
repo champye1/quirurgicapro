@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
 import { MessageSquare, Save, CheckCircle2, AlertTriangle, Phone, Wifi, WifiOff, Building2, Bell, Play, Download, Database, FileSignature, BookOpen } from 'lucide-react'
@@ -34,10 +34,12 @@ export default function Configuracion() {
   const [clinicCargado, setClinicCargado] = useState(false)
   const saveClinicInfo = useSaveClinicInfo()
 
-  if (clinicInfo && !clinicCargado) {
-    setClinicForm(clinicInfo)
-    setClinicCargado(true)
-  }
+  useEffect(() => {
+    if (clinicInfo && !clinicCargado) {
+      setClinicForm(clinicInfo)
+      setClinicCargado(true)
+    }
+  }, [clinicInfo, clinicCargado])
 
   // Recordatorios
   const [diasRecordatorio, setDiasRecordatorio] = useState(1)
@@ -149,7 +151,7 @@ export default function Configuracion() {
         if (!c.doctors?.user_id) continue
         const { error } = await supabase.from('notifications').insert({
           user_id: c.doctors.user_id,
-          tipo: 'recordatorio_cirugia',
+          tipo: 'recordatorio',
           titulo: `Recordatorio: cirugía mañana`,
           mensaje: `Tienes una cirugía programada el ${fechaStr} a las ${c.hora_inicio?.slice(0, 5)} en ${c.operating_rooms?.nombre || 'pabellón'}. Paciente: ${c.patients?.nombre} ${c.patients?.apellido}.`,
           relacionado_con: c.id,

@@ -44,8 +44,8 @@ export default function Solicitudes() {
         .from('doctors')
         .select('id')
         .eq('user_id', user.id)
-        .single()
-      
+        .maybeSingle()
+
       if (error) throw error
       return data
     },
