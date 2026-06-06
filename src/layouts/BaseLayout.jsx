@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../config/supabase'
-import { Settings, Menu, Search, Stethoscope } from 'lucide-react'
+import { Settings, Menu, Search, Stethoscope, Compass } from 'lucide-react'
+import { useTour } from '../hooks/useTour'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { LayoutErrorBoundary } from '../components/common/ErrorBoundary'
 import OfflineBanner from '../components/common/OfflineBanner'
@@ -45,6 +46,7 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
   const hadSessionRef = useRef(false)
   const notificationsDropdownRef = useRef(null)
   const basePrefix = location.pathname.startsWith('/pabellon') ? '/pabellon' : '/doctor'
+  const { startTour } = useTour()
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -193,19 +195,22 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            <NotificationsDropdown
-              ref={notificationsDropdownRef}
-              isDark={isDark}
-              isMedical={isMedical}
-              showDropdown={showNotificationsDropdown}
-              onToggle={() => setShowNotificationsDropdown(v => !v)}
-              unreadCount={unreadCount}
-              notifications={notifications}
-              onMarkAllRead={() => markAllAsRead.mutate()}
-              onNotificationClick={handleNotificationClick}
-            />
+            <div id="tour-header-notifications">
+              <NotificationsDropdown
+                ref={notificationsDropdownRef}
+                isDark={isDark}
+                isMedical={isMedical}
+                showDropdown={showNotificationsDropdown}
+                onToggle={() => setShowNotificationsDropdown(v => !v)}
+                unreadCount={unreadCount}
+                notifications={notifications}
+                onMarkAllRead={() => markAllAsRead.mutate()}
+                onNotificationClick={handleNotificationClick}
+              />
+            </div>
 
             <button
+              id="tour-header-search"
               onClick={() => setShowCommandPalette(true)}
               title="Búsqueda global (Ctrl+K)"
               className={`flex items-center gap-2 h-8 sm:h-10 px-2.5 sm:px-3 ${headerBtnClass} rounded-xl border transition-all text-xs font-bold`}
@@ -214,6 +219,16 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
               <Search className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Buscar</span>
               <kbd className="hidden md:inline text-[9px] border border-current rounded px-1 opacity-60">⌘K</kbd>
+            </button>
+
+            <button
+              onClick={startTour}
+              title="Tour guiado"
+              className={`hidden sm:flex items-center gap-1.5 h-8 sm:h-10 px-2.5 sm:px-3 ${headerBtnClass} rounded-xl border transition-all text-xs font-bold`}
+              aria-label="Iniciar tour guiado"
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Tour</span>
             </button>
 
             <button

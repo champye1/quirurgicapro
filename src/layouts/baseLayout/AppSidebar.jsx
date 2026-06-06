@@ -101,7 +101,7 @@ export default function AppSidebar({
           </button>
         </div>
 
-        <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-1" aria-label="Menú principal">
+        <nav id="tour-sidebar-nav" className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-1" aria-label="Menú principal">
           {!isCollapsed && (
             <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 px-2 animate-in fade-in text-slate-400">
               Navegación

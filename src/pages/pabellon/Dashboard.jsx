@@ -609,7 +609,7 @@ export default function Dashboard() {
       )}
 
       {/* Métricas principales (3 tarjetas) */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-10">
+      <div id="tour-metricas" className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-10">
         {isLoadingOcupacion || isLoadingSolicitudes ? (
           Array.from({ length: 3 }).map((_, i) => (
             <MetricSkeleton key={i} />
@@ -802,7 +802,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 min-h-[400px] sm:min-h-[450px] lg:h-[500px]">
         {/* Solicitudes pendientes */}
-        <Card className="lg:col-span-2 flex flex-col">
+        <Card id="tour-solicitudes-card" className="lg:col-span-2 flex flex-col">
           <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
             <h3 className={`font-black uppercase text-[10px] sm:text-xs flex items-center gap-2 ${
               theme === 'dark' ? 'text-white' : 'text-slate-800'
@@ -873,6 +873,7 @@ export default function Dashboard() {
 
         {/* Muro de Recordatorios */}
         <Card
+          id="tour-recordatorios-card"
           className={`flex flex-col relative overflow-hidden ${
             theme === 'dark'
               ? 'bg-slate-900 text-white border-slate-800'
