@@ -400,27 +400,85 @@ const TOUR_STEPS = {
   ],
 }
 
+// Tours para páginas adicionales del menú
+const EXTRA_STEPS = {
+  '/pabellon/perfil': [
+    {
+      popover: {
+        title: 'Mi Perfil',
+        description: 'Gestiona tu cuenta personal: correo electrónico, contraseña y seguridad adicional.',
+        side: 'over', align: 'center',
+      },
+    },
+    {
+      popover: {
+        title: 'Cambiar contraseña',
+        description: 'Escribe tu contraseña actual y la nueva para actualizarla. Usa al menos 8 caracteres con letras y números.',
+        side: 'over', align: 'center',
+      },
+    },
+    {
+      popover: {
+        title: 'Doble Factor (2FA)',
+        description: 'Agrega una capa extra de seguridad con Google Authenticator o Authy. Recomendado para proteger el acceso a la clínica.',
+        side: 'over', align: 'center',
+      },
+    },
+  ],
+
+  '/pabellon/ayuda': [
+    {
+      popover: {
+        title: 'Centro de Ayuda',
+        description: 'Preguntas frecuentes organizadas por tema. Busca tu duda o contacta al soporte directamente desde aquí.',
+        side: 'over', align: 'center',
+      },
+    },
+    {
+      popover: {
+        title: 'Canales de soporte',
+        description: 'Chat en vivo (Lun–Vie 9–18h), correo y teléfono. Para dudas urgentes durante cirugías usa el chat — tiempo de respuesta bajo 5 minutos.',
+        side: 'over', align: 'center',
+      },
+    },
+    {
+      popover: {
+        title: 'Preguntas frecuentes',
+        description: 'Las FAQ están agrupadas por módulo. Si no encuentras tu respuesta, el botón de contacto al final abre un ticket directamente al equipo de QuirúrgicaPro.',
+        side: 'over', align: 'center',
+      },
+    },
+  ],
+}
+
 // Fallback para rutas sin tour específico
 const DEFAULT_STEPS = [
   {
     popover: {
-      title: 'Sección en exploración',
-      description: 'Esta sección no tiene tour personalizado aún. Usa la navegación del menú lateral para explorar las demás funciones.',
+      title: 'Tour no disponible aquí',
+      description: 'Esta página no tiene tour específico. Navega a otra sección del menú y pulsa Tour para ver su guía.',
       side: 'over', align: 'center',
     },
   },
 ]
 
+const ALL_STEPS = { ...TOUR_STEPS, ...EXTRA_STEPS }
+
 // ─────────────────────────────────────────────
 
 function getStepsForPath(pathname) {
-  // Coincidencia exacta primero
-  if (TOUR_STEPS[pathname]) return TOUR_STEPS[pathname]
-  // Coincidencia por prefijo (ej: /pabellon/solicitudes/xxx → /pabellon/solicitudes)
-  const match = Object.keys(TOUR_STEPS)
-    .filter(k => pathname.startsWith(k))
+  const path = pathname.replace(/\/$/, '') || '/'
+
+  // 1. Coincidencia exacta
+  if (ALL_STEPS[path]) return ALL_STEPS[path]
+
+  // 2. Coincidencia por prefijo SOLO para claves con más de un segmento
+  //    (evita que '/pabellon' coincida con '/pabellon/perfil')
+  const match = Object.keys(ALL_STEPS)
+    .filter(k => k.includes('/', 1) && path.startsWith(k + '/'))
     .sort((a, b) => b.length - a.length)[0]
-  return match ? TOUR_STEPS[match] : DEFAULT_STEPS
+
+  return match ? ALL_STEPS[match] : DEFAULT_STEPS
 }
 
 export function useTour() {
