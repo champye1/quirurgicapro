@@ -453,128 +453,25 @@ export default function Configuracion() {
         </Button>
       </Card>
 
-      {/* ── WhatsApp Business ── */}
-      <Card id="tour-cfg-whatsapp" hover={false} className="p-6 space-y-6">
-        {/* Header de sección */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-            <MessageSquare size={20} className="text-green-600" />
+      {/* ── WhatsApp Business — Módulo adicional ── */}
+      <Card id="tour-cfg-whatsapp" hover={false} className={`p-5 opacity-60 ${isDark ? '' : ''}`}>
+        <div className="flex items-center gap-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
+            <MessageSquare size={20} className={isDark ? 'text-slate-400' : 'text-slate-400'} />
           </div>
-          <div>
-            <h3 className={`font-black text-sm uppercase tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              WhatsApp Business
-            </h3>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Notificaciones automáticas a pacientes y médicos
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className={`font-black text-sm uppercase tracking-tight ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
+                WhatsApp Business
+              </h3>
+              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                Módulo adicional
+              </span>
+            </div>
+            <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              Notificaciones automáticas a pacientes y médicos vía WhatsApp API. Disponible bajo solicitud.
             </p>
           </div>
-          <div className="ml-auto">
-            <button
-              onClick={() => setForm(f => ({ ...f, activo: !f.activo }))}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.activo ? 'bg-green-500' : (isDark ? 'bg-slate-600' : 'bg-slate-200')}`}
-              role="switch"
-              aria-checked={form.activo}
-              aria-label="Activar WhatsApp"
-            >
-              <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${form.activo ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Info banner */}
-        <div className={`flex items-start gap-3 rounded-xl p-4 border ${isDark ? 'bg-blue-900/20 border-blue-800 text-blue-200' : 'bg-blue-50 border-blue-100 text-blue-800'}`}>
-          <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-          <p className="text-xs font-medium leading-relaxed">
-            Se requiere una cuenta de <strong>WhatsApp Business API</strong> (Twilio, Meta Cloud API u otro proveedor). Ingresa las credenciales proporcionadas por tu proveedor.
-          </p>
-        </div>
-
-        {/* Campos */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className={`h-10 rounded-xl animate-pulse ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`} />)}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className={labelClass}>
-                <Phone size={9} className="inline mr-1" /> Número de envío
-              </label>
-              <input
-                type="tel"
-                placeholder="+56912345678"
-                value={form.numero}
-                onChange={e => { setForm(f => ({ ...f, numero: e.target.value })); setTestResult(null) }}
-                className={fieldClass}
-              />
-              <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Número en formato internacional con código de país</p>
-            </div>
-
-            <div>
-              <label className={labelClass}>ID de instancia / SID</label>
-              <input
-                type="text"
-                placeholder="instance_id o account_sid"
-                value={form.instancia}
-                onChange={e => { setForm(f => ({ ...f, instancia: e.target.value })); setTestResult(null) }}
-                className={fieldClass}
-              />
-            </div>
-
-            <div>
-              <label className={labelClass}>Token de acceso</label>
-              <input
-                type="password"
-                placeholder="••••••••••••••••"
-                value={form.token}
-                onChange={e => { setForm(f => ({ ...f, token: e.target.value })); setTestResult(null) }}
-                className={fieldClass}
-                autoComplete="new-password"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Resultado del test */}
-        {testResult && (
-          <div className={`flex items-center gap-2 text-xs font-bold rounded-xl px-4 py-3 ${
-            testResult === 'ok'
-              ? (isDark ? 'bg-green-900/30 text-green-400 border border-green-700' : 'bg-green-50 text-green-700 border border-green-200')
-              : (isDark ? 'bg-red-900/30 text-red-400 border border-red-700' : 'bg-red-50 text-red-700 border border-red-200')
-          }`}>
-            {testResult === 'ok' ? <Wifi size={14} /> : <WifiOff size={14} />}
-            {testResult === 'ok' ? 'Conexión exitosa con WhatsApp API' : 'No se pudo conectar — verifique las credenciales'}
-          </div>
-        )}
-
-        {/* Estado actual */}
-        <div className={`flex items-center gap-2 text-xs font-bold rounded-xl px-4 py-3 ${
-          form.activo
-            ? (isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-50 text-green-700')
-            : (isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-500')
-        }`}>
-          <CheckCircle2 size={14} />
-          {form.activo ? 'Integración activa — se enviarán notificaciones por WhatsApp' : 'Integración desactivada'}
-        </div>
-
-        <div className="flex gap-3">
-          <Button
-            variant="secondary"
-            onClick={() => probarConexion.mutate()}
-            loading={probarConexion.isPending}
-            className="flex-1"
-          >
-            <Wifi size={14} className="mr-2" />
-            Probar conexión
-          </Button>
-          <Button
-            onClick={() => guardar.mutate()}
-            loading={guardar.isPending}
-            className="flex-1"
-          >
-            <Save size={15} className="mr-2" />
-            Guardar
-          </Button>
         </div>
       </Card>
 
@@ -675,154 +572,26 @@ export default function Configuracion() {
         )}
       </Card>
 
-      {/* ── Facturación Electrónica ── */}
-
-      <Card id="tour-cfg-facturacion" hover={false} className="p-6 space-y-5">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-emerald-900/40' : 'bg-emerald-50'}`}>
-            <Receipt size={20} className={isDark ? 'text-emerald-400' : 'text-emerald-600'} />
+      {/* ── Facturación Electrónica — Módulo adicional ── */}
+      <Card id="tour-cfg-facturacion" hover={false} className="p-5 opacity-60">
+        <div className="flex items-center gap-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
+            <Receipt size={20} className={isDark ? 'text-slate-400' : 'text-slate-400'} />
           </div>
-          <div>
-            <h3 className={`font-black text-sm uppercase tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Facturación Electrónica
-            </h3>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Boletas y facturas via OpenFactura (Haulmer)
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className={`font-black text-sm uppercase tracking-tight ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
+                Facturación Electrónica
+              </h3>
+              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                Módulo adicional
+              </span>
+            </div>
+            <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              Emisión de boletas y facturas electrónicas (DTE) vía OpenFactura. Disponible bajo solicitud.
             </p>
           </div>
         </div>
-
-        <div className={`flex items-start gap-3 rounded-xl p-4 border ${isDark ? 'bg-emerald-900/20 border-emerald-800 text-emerald-200' : 'bg-emerald-50 border-emerald-100 text-emerald-800'}`}>
-          <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-          <p className="text-xs font-medium leading-relaxed">
-            Necesitas una cuenta en <strong>OpenFactura (openfactura.cl)</strong>. Activa el <strong>sandbox</strong> para pruebas gratuitas. Desactívalo cuando tu cliente empiece a emitir documentos reales.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {/* API Key */}
-          <div>
-            <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-              API Key <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={showApiKey ? 'text' : 'password'}
-                value={factForm.api_key}
-                onChange={e => setFactForm(v => ({ ...v, api_key: sanitizeString(e.target.value) }))}
-                placeholder="tu-api-key-de-openfactura"
-                className={`w-full px-4 py-2.5 pr-10 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowApiKey(v => !v)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}
-              >
-                {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {/* RUT Emisor + Razón Social */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                RUT Empresa <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={factForm.rut_emisor}
-                onChange={e => setFactForm(v => ({ ...v, rut_emisor: sanitizeString(e.target.value) }))}
-                placeholder="12345678-9"
-                maxLength={12}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                Razón Social <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={factForm.razon_social}
-                onChange={e => setFactForm(v => ({ ...v, razon_social: sanitizeString(e.target.value) }))}
-                placeholder="Clínica Quirúrgica SpA"
-                maxLength={100}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-              />
-            </div>
-          </div>
-
-          {/* Giro */}
-          <div>
-            <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Giro</label>
-            <input
-              type="text"
-              value={factForm.giro}
-              onChange={e => setFactForm(v => ({ ...v, giro: sanitizeString(e.target.value) }))}
-              placeholder="Servicios Médicos Quirúrgicos"
-              maxLength={80}
-              className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-            />
-          </div>
-
-          {/* Dirección + Comuna */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Dirección</label>
-              <input
-                type="text"
-                value={factForm.direccion}
-                onChange={e => setFactForm(v => ({ ...v, direccion: sanitizeString(e.target.value) }))}
-                placeholder="Av. Principal 123"
-                maxLength={80}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Comuna</label>
-              <input
-                type="text"
-                value={factForm.comuna}
-                onChange={e => setFactForm(v => ({ ...v, comuna: sanitizeString(e.target.value) }))}
-                placeholder="Viña del Mar"
-                maxLength={50}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
-              />
-            </div>
-          </div>
-
-          {/* Sandbox toggle */}
-          <div className={`flex items-center justify-between rounded-xl px-4 py-3 ${isDark ? 'bg-slate-700/50' : 'bg-slate-50'}`}>
-            <div>
-              <p className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Modo Sandbox</p>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Activado = documentos de prueba, no válidos ante el SII</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setFactForm(v => ({ ...v, sandbox: !v.sandbox }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${factForm.sandbox ? 'bg-emerald-500' : 'bg-slate-300'}`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${factForm.sandbox ? 'translate-x-5' : 'translate-x-0.5'}`} />
-            </button>
-          </div>
-        </div>
-
-        {factResult && (
-          <div className={`flex items-center gap-2 text-xs font-bold rounded-xl px-4 py-3 ${
-            factResult === 'ok'
-              ? (isDark ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-700' : 'bg-emerald-50 text-emerald-700 border border-emerald-200')
-              : (isDark ? 'bg-red-900/30 text-red-400 border border-red-700' : 'bg-red-50 text-red-700 border border-red-200')
-          }`}>
-            {factResult === 'ok' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
-            {factResult === 'ok' ? 'Configuración guardada correctamente.' : 'Error al guardar. Intenta nuevamente.'}
-          </div>
-        )}
-
-        <Button onClick={handleSaveFacturacion} disabled={factGuardando} className="w-full">
-          <Save size={15} />
-          {factGuardando ? 'Guardando...' : 'Guardar Configuración'}
-        </Button>
       </Card>
 
       {/* Documentos */}
