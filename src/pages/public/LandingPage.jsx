@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   Calendar, Users, Package, Bell, CheckCircle, ArrowRight, Shield,
   Clock, ChevronRight, Mail, Stethoscope, ClipboardList, BarChart3,
-  Zap, X, ChevronDown, ChevronUp, FileText, MessageSquare, Star, Eye,
+  Zap, X, ChevronDown, ChevronUp, FileText, MessageSquare, Eye,
 } from 'lucide-react'
 
 const FEATURES = [
@@ -87,29 +87,6 @@ const COMPARISON = [
   { feature: 'Datos seguros y respaldados',     pro: true,  excel: false, whatsapp: false },
 ]
 
-const TESTIMONIALS = [
-  {
-    name: 'Director Médico',
-    role: 'Clínica quirúrgica',
-    clinic: 'Región de Valparaíso',
-    text: 'Antes coordinábamos todo por WhatsApp. Hoy cada médico ve su agenda en tiempo real y el pabellón no pierde tiempo en llamadas. El cambio fue inmediato.',
-    stars: 5,
-  },
-  {
-    name: 'Jefa de Pabellón',
-    role: 'Centro quirúrgico privado',
-    clinic: 'Región Metropolitana',
-    text: 'La importación masiva de médicos nos ahorró días de trabajo al inicio. El wizard de configuración fue muy intuitivo para todo el equipo.',
-    stars: 5,
-  },
-  {
-    name: 'Cirujano General',
-    role: 'Clínica privada',
-    clinic: 'Santiago',
-    text: 'Por fin tengo visibilidad de mis cirugías desde el celular. Las notificaciones automáticas son un diferenciador enorme para los pacientes.',
-    stars: 5,
-  },
-]
 
 const FAQS = [
   {
@@ -474,31 +451,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIOS ── */}
-      <section className="py-24 px-4 sm:px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
-              Lo que dicen las clínicas que ya usan QuirúrgicaPro
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.stars }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-slate-700 text-sm leading-relaxed mb-5 italic">"{t.text}"</p>
-                <div>
-                  <p className="font-bold text-slate-900 text-sm">{t.name}</p>
-                  <p className="text-xs text-slate-500">{t.role}</p>
-                  <p className="text-xs text-blue-600 font-medium mt-0.5">{t.clinic}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── BETA CTA ── */}
+      <section className="py-20 px-4 sm:px-6 bg-white">
+        <div className="max-w-2xl mx-auto text-center">
+          <span className="inline-block bg-blue-100 text-blue-700 text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+            Acceso anticipado
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+            Sé la primera clínica en usar QuirúrgicaPro
+          </h2>
+          <p className="text-slate-500 text-lg mb-8">
+            Estamos incorporando nuestras primeras clínicas. Las que entren ahora obtienen precio especial de lanzamiento y soporte personalizado durante la instalación.
+          </p>
+          <Link
+            to="/contacto"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-4 rounded-2xl text-base transition-colors"
+          >
+            Solicitar acceso anticipado →
+          </Link>
         </div>
       </section>
 
@@ -525,8 +495,8 @@ export default function LandingPage() {
               <div className="mb-6">
                 <p className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-2">Plan Clínica</p>
                 <div className="flex items-end gap-1 mb-1">
-                  <span className="text-5xl font-black text-slate-900">$990</span>
-                  <span className="text-slate-500 text-lg mb-1">USD</span>
+                  <span className="text-5xl font-black text-slate-900">$750.000</span>
+                  <span className="text-slate-500 text-lg mb-1">CLP</span>
                 </div>
                 <p className="text-slate-500 text-sm">Pago único · Licencia permanente</p>
               </div>
@@ -560,8 +530,8 @@ export default function LandingPage() {
               <div className="mb-6">
                 <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Plan Clínica + Soporte</p>
                 <div className="flex items-end gap-1 mb-1">
-                  <span className="text-5xl font-black text-slate-900">$1.490</span>
-                  <span className="text-slate-500 text-lg mb-1">USD</span>
+                  <span className="text-5xl font-black text-slate-900">$1.100.000</span>
+                  <span className="text-slate-500 text-lg mb-1">CLP</span>
                 </div>
                 <p className="text-slate-500 text-sm">Pago único · Todo incluido</p>
               </div>
