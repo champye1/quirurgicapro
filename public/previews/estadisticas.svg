@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+  <rect width="960" height="600" fill="#f1f5f9"/>
+  <!-- Header -->
+  <rect width="960" height="60" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="24" y="20" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" font-weight="700" letter-spacing="1.5">REPORTES</text>
+  <text x="24" y="44" font-family="system-ui,sans-serif" font-size="19" fill="#0f172a" font-weight="900">Estadísticas y Reportes</text>
+  <rect x="820" y="16" width="116" height="34" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="878" y="38" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Junio 2025 ▾</text>
+  <!-- KPI Cards -->
+  <rect x="24" y="76" width="215" height="88" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="44" y="102" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" font-weight="600">Cirugías realizadas</text>
+  <text x="44" y="140" font-family="system-ui,sans-serif" font-size="34" fill="#2563eb" font-weight="900">48</text>
+  <text x="88" y="140" font-family="system-ui,sans-serif" font-size="11" fill="#16a34a" font-weight="700">↑ 12%</text>
+  <rect x="255" y="76" width="215" height="88" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="275" y="102" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" font-weight="600">Tasa de ocupación</text>
+  <text x="275" y="140" font-family="system-ui,sans-serif" font-size="34" fill="#16a34a" font-weight="900">85%</text>
+  <text x="330" y="140" font-family="system-ui,sans-serif" font-size="11" fill="#16a34a" font-weight="700">↑ 3%</text>
+  <rect x="486" y="76" width="215" height="88" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="506" y="102" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" font-weight="600">Médicos activos</text>
+  <text x="506" y="140" font-family="system-ui,sans-serif" font-size="34" fill="#7c3aed" font-weight="900">23</text>
+  <rect x="717" y="76" width="219" height="88" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="737" y="102" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" font-weight="600">Pacientes atendidos</text>
+  <text x="737" y="140" font-family="system-ui,sans-serif" font-size="34" fill="#d97706" font-weight="900">132</text>
+  <text x="796" y="140" font-family="system-ui,sans-serif" font-size="11" fill="#16a34a" font-weight="700">↑ 8%</text>
+  <!-- Bar chart -->
+  <rect x="24" y="180" width="600" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="44" y="208" font-family="system-ui,sans-serif" font-size="13" fill="#0f172a" font-weight="800">Cirugías por mes</text>
+  <text x="44" y="224" font-family="system-ui,sans-serif" font-size="10" fill="#94a3b8">Últimos 6 meses</text>
+  <!-- Y-axis labels -->
+  <text x="50" y="408" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">0</text>
+  <text x="50" y="378" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">10</text>
+  <text x="50" y="348" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">20</text>
+  <text x="50" y="318" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">30</text>
+  <text x="50" y="288" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">40</text>
+  <text x="50" y="258" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">50</text>
+  <!-- Grid lines -->
+  <line x1="58" y1="408" x2="596" y2="408" stroke="#f1f5f9" stroke-width="1"/>
+  <line x1="58" y1="378" x2="596" y2="378" stroke="#f1f5f9" stroke-width="1"/>
+  <line x1="58" y1="348" x2="596" y2="348" stroke="#f1f5f9" stroke-width="1"/>
+  <line x1="58" y1="318" x2="596" y2="318" stroke="#f1f5f9" stroke-width="1"/>
+  <line x1="58" y1="288" x2="596" y2="288" stroke="#f1f5f9" stroke-width="1"/>
+  <line x1="58" y1="258" x2="596" y2="258" stroke="#f1f5f9" stroke-width="1"/>
+  <!-- Bars -->
+  <!-- Enero: 32 → height 192px from bottom of chart at y=408 -->
+  <rect x="76" y="216" width="65" height="192" rx="6" fill="#dbeafe"/>
+  <text x="108" y="208" font-family="system-ui,sans-serif" font-size="10" fill="#2563eb" font-weight="700" text-anchor="middle">32</text>
+  <text x="108" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Ene</text>
+  <!-- Febrero: 38 -->
+  <rect x="163" y="180" width="65" height="228" rx="6" fill="#bfdbfe"/>
+  <text x="195" y="172" font-family="system-ui,sans-serif" font-size="10" fill="#2563eb" font-weight="700" text-anchor="middle">38</text>
+  <text x="195" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Feb</text>
+  <!-- Marzo: 35 -->
+  <rect x="250" y="198" width="65" height="210" rx="6" fill="#bfdbfe"/>
+  <text x="282" y="190" font-family="system-ui,sans-serif" font-size="10" fill="#2563eb" font-weight="700" text-anchor="middle">35</text>
+  <text x="282" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Mar</text>
+  <!-- Abril: 41 -->
+  <rect x="337" y="162" width="65" height="246" rx="6" fill="#93c5fd"/>
+  <text x="369" y="154" font-family="system-ui,sans-serif" font-size="10" fill="#2563eb" font-weight="700" text-anchor="middle">41</text>
+  <text x="369" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Abr</text>
+  <!-- Mayo: 44 -->
+  <rect x="424" y="144" width="65" height="264" rx="6" fill="#60a5fa"/>
+  <text x="456" y="136" font-family="system-ui,sans-serif" font-size="10" fill="#1d4ed8" font-weight="700" text-anchor="middle">44</text>
+  <text x="456" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle">May</text>
+  <!-- Junio: 48 (current - highlighted) -->
+  <rect x="511" y="120" width="65" height="288" rx="6" fill="#2563eb"/>
+  <text x="543" y="112" font-family="system-ui,sans-serif" font-size="10" fill="#1d4ed8" font-weight="700" text-anchor="middle">48</text>
+  <text x="543" y="422" font-family="system-ui,sans-serif" font-size="10" fill="#2563eb" font-weight="700" text-anchor="middle">Jun</text>
+  <!-- Donut chart - previsión -->
+  <rect x="640" y="180" width="296" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="660" y="208" font-family="system-ui,sans-serif" font-size="13" fill="#0f172a" font-weight="800">Previsión de pacientes</text>
+  <!-- Simple donut (circle approximation) -->
+  <circle cx="788" cy="320" r="72" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Segments as arcs approximated by colored circles with clip -->
+  <!-- FONASA 45% -->
+  <path d="M 788 320 L 788 248 A 72 72 0 0 1 859 320 Z" fill="#2563eb"/>
+  <!-- ISAPRE 30% -->
+  <path d="M 788 320 L 859 320 A 72 72 0 0 1 788 392 Z" fill="#16a34a"/>
+  <!-- Particular 15% -->
+  <path d="M 788 320 L 788 392 A 72 72 0 0 1 727 366 Z" fill="#d97706"/>
+  <!-- Capredena 10% -->
+  <path d="M 788 320 L 727 366 A 72 72 0 0 1 788 248 Z" fill="#7c3aed"/>
+  <!-- Center hole -->
+  <circle cx="788" cy="320" r="40" fill="#ffffff"/>
+  <text x="788" y="324" font-family="system-ui,sans-serif" font-size="11" fill="#0f172a" font-weight="900" text-anchor="middle">132</text>
+  <text x="788" y="336" font-family="system-ui,sans-serif" font-size="8" fill="#94a3b8" text-anchor="middle">pacientes</text>
+  <!-- Legend -->
+  <rect x="660" y="397" width="10" height="10" rx="2" fill="#2563eb"/>
+  <text x="676" y="407" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">FONASA 45%</text>
+  <rect x="760" y="397" width="10" height="10" rx="2" fill="#16a34a"/>
+  <text x="776" y="407" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">ISAPRE 30%</text>
+  <rect x="660" y="415" width="10" height="10" rx="2" fill="#d97706"/>
+  <text x="676" y="425" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">Particular 15%</text>
+  <rect x="760" y="415" width="10" height="10" rx="2" fill="#7c3aed"/>
+  <text x="776" y="425" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">Otro 10%</text>
+  <!-- Bottom stats row -->
+  <rect x="24" y="456" width="912" height="120" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="44" y="482" font-family="system-ui,sans-serif" font-size="12" fill="#0f172a" font-weight="800">Top procedimientos del mes</text>
+  <!-- Procedure bars -->
+  <text x="44" y="508" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Colecistectomía</text>
+  <rect x="180" y="498" width="200" height="12" rx="4" fill="#dbeafe"/>
+  <rect x="180" y="498" width="200" height="12" rx="4" fill="#2563eb"/>
+  <text x="390" y="508" font-family="system-ui,sans-serif" font-size="11" fill="#2563eb" font-weight="700">14</text>
+  <text x="44" y="530" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Hernioplastía</text>
+  <rect x="180" y="520" width="145" height="12" rx="4" fill="#dcfce7"/>
+  <rect x="180" y="520" width="145" height="12" rx="4" fill="#16a34a"/>
+  <text x="334" y="530" font-family="system-ui,sans-serif" font-size="11" fill="#16a34a" font-weight="700">10</text>
+  <text x="44" y="552" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Apendicectomía</text>
+  <rect x="180" y="542" width="115" height="12" rx="4" fill="#fef3c7"/>
+  <rect x="180" y="542" width="115" height="12" rx="4" fill="#d97706"/>
+  <text x="304" y="552" font-family="system-ui,sans-serif" font-size="11" fill="#d97706" font-weight="700">8</text>
+  <text x="540" y="508" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Safenectomía</text>
+  <rect x="668" y="498" width="100" height="12" rx="4" fill="#ede9fe"/>
+  <rect x="668" y="498" width="100" height="12" rx="4" fill="#7c3aed"/>
+  <text x="778" y="508" font-family="system-ui,sans-serif" font-size="11" fill="#7c3aed" font-weight="700">7</text>
+  <text x="540" y="530" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Mastectomía</text>
+  <rect x="668" y="520" width="71" height="12" rx="4" fill="#fce7f3"/>
+  <rect x="668" y="520" width="71" height="12" rx="4" fill="#db2777"/>
+  <text x="748" y="530" font-family="system-ui,sans-serif" font-size="11" fill="#db2777" font-weight="700">5</text>
+  <text x="540" y="552" font-family="system-ui,sans-serif" font-size="11" fill="#64748b">Colectomía</text>
+  <rect x="668" y="542" width="57" height="12" rx="4" fill="#fef3c7"/>
+  <rect x="668" y="542" width="57" height="12" rx="4" fill="#d97706"/>
+  <text x="734" y="552" font-family="system-ui,sans-serif" font-size="11" fill="#d97706" font-weight="700">4</text>
+</svg>

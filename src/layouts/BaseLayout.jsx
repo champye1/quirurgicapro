@@ -188,7 +188,7 @@ export default function BaseLayout({ menuItems, portalLabel, badgeCounts = {}, o
                 <Stethoscope className="text-white w-5 h-5" aria-hidden="true" />
               </div>
               <div>
-                <h2 className="text-sm font-black text-slate-900 tracking-tighter uppercase leading-none">SurgicalHUB</h2>
+                <h2 className="text-sm font-black text-slate-900 tracking-tighter uppercase leading-none">QuirúrgicaPro</h2>
                 <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{portalLabel}</span>
               </div>
             </div>

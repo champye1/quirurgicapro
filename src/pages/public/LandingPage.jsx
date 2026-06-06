@@ -12,7 +12,7 @@ const FEATURES = [
     title: 'Agenda quirúrgica',
     description: 'Calendario visual por pabellón con vistas diaria, semanal y anual. Detecta solapamientos y gestiona bloqueos en tiempo real.',
     color: 'bg-blue-50 text-blue-600',
-    preview: '/previews/agenda-quirurgica.png',
+    preview: '/previews/agenda-quirurgica.svg',
     previewCaption: 'Calendario de pabellones con vista diaria, semanal y anual',
   },
   {
@@ -20,7 +20,7 @@ const FEATURES = [
     title: 'Portal del médico',
     description: 'Cada cirujano tiene su propio acceso para solicitar procedimientos, ver el estado de sus cirugías y recibir notificaciones al instante.',
     color: 'bg-indigo-50 text-indigo-600',
-    preview: '/previews/portal-medico.png',
+    preview: '/previews/portal-medico.svg',
     previewCaption: 'Panel del médico con solicitudes, calendario personal y notificaciones',
   },
   {
@@ -28,7 +28,7 @@ const FEATURES = [
     title: 'Control de insumos',
     description: 'Stock en tiempo real con alertas de mínimo. Registro de movimientos de entrada y salida. Exportación a Excel y PDF.',
     color: 'bg-emerald-50 text-emerald-600',
-    preview: '/previews/control-insumos.png',
+    preview: '/previews/control-insumos.svg',
     previewCaption: 'Inventario en tiempo real con alertas de stock mínimo',
   },
   {
@@ -36,7 +36,7 @@ const FEATURES = [
     title: 'Notificaciones automáticas',
     description: 'El médico recibe confirmación al aceptar su cirugía vía WhatsApp o email. Sin llamadas, sin mensajes manuales.',
     color: 'bg-amber-50 text-amber-600',
-    preview: '/previews/notificaciones.png',
+    preview: '/previews/notificaciones.svg',
     previewCaption: 'Notificaciones automáticas por WhatsApp y email al aceptar o rechazar',
   },
   {
@@ -44,7 +44,7 @@ const FEATURES = [
     title: 'Auditoría completa',
     description: 'Registro de cada acción: quién programó, cuándo y qué cambió. Trazabilidad total para cumplimiento normativo MINSAL.',
     color: 'bg-rose-50 text-rose-600',
-    preview: '/previews/auditoria.png',
+    preview: '/previews/auditoria.svg',
     previewCaption: 'Log de auditoría con cada acción registrada por usuario y fecha',
   },
   {
@@ -52,7 +52,7 @@ const FEATURES = [
     title: 'Reportes y estadísticas',
     description: 'Dashboard ejecutivo en tiempo real. Exporta reportes de cirugías, ocupación de pabellones e inventario en PDF con tu logo.',
     color: 'bg-violet-50 text-violet-600',
-    preview: '/previews/estadisticas.png',
+    preview: '/previews/estadisticas.svg',
     previewCaption: 'Dashboard ejecutivo con gráficos de ocupación y estadísticas mensuales',
   },
 ]

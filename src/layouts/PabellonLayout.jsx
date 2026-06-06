@@ -1,7 +1,7 @@
 import { lazy, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import {
-  Home, FileText, Calendar, Clock, Users, Package, Mail, FileSearch, User, Settings, BarChart2, MessageSquare, HelpCircle,
+  Home, FileText, Calendar, Clock, Users, Package, Mail, FileSearch, User, Settings, BarChart2, MessageSquare, HelpCircle, UserRound,
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../config/supabase'
@@ -13,6 +13,7 @@ const Solicitudes   = lazy(() => import('../pages/pabellon/Solicitudes'))
 const Calendario    = lazy(() => import('../pages/pabellon/Calendario'))
 const BloqueoHorario = lazy(() => import('../pages/pabellon/BloqueoHorario'))
 const Medicos       = lazy(() => import('../pages/pabellon/Medicos'))
+const Pacientes     = lazy(() => import('../pages/pabellon/Pacientes'))
 const Insumos       = lazy(() => import('../pages/pabellon/Insumos'))
 const Auditoria     = lazy(() => import('../pages/pabellon/Auditoria'))
 const Estadisticas    = lazy(() => import('../pages/pabellon/Estadisticas'))
@@ -28,6 +29,7 @@ const MENU = [
   { path: '/pabellon/calendario',  icon: Calendar,  label: 'Calendario' },
   { path: '/pabellon/bloqueo',     icon: Clock,     label: 'Bloqueo Horario' },
   { path: '/pabellon/medicos',     icon: Users,     label: 'Médicos' },
+  { path: '/pabellon/pacientes',   icon: UserRound, label: 'Pacientes' },
   { path: '/pabellon/insumos',     icon: Package,   label: 'Insumos' },
   { path: '/pabellon/estadisticas', icon: BarChart2,      label: 'Estadísticas' },
   { path: '/pabellon/chat',         icon: MessageSquare,  label: 'Chat Médicos' },
@@ -99,6 +101,7 @@ export default function PabellonLayout() {
         <Route path="/calendario"  element={<Calendario />} />
         <Route path="/bloqueo"     element={<BloqueoHorario />} />
         <Route path="/medicos"     element={<Medicos />} />
+        <Route path="/pacientes"   element={<Pacientes />} />
         <Route path="/insumos"     element={<Insumos />} />
         <Route path="/estadisticas"   element={<Estadisticas />} />
         <Route path="/chat"           element={<ChatPabellon />} />

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+  <rect width="960" height="600" fill="#f1f5f9"/>
+  <!-- Header bar -->
+  <rect width="960" height="58" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="24" y="20" font-family="system-ui,sans-serif" font-size="9" fill="#94a3b8" font-weight="700" letter-spacing="1.5">CALENDARIO QUIRÚRGICO</text>
+  <text x="24" y="42" font-family="system-ui,sans-serif" font-size="19" fill="#0f172a" font-weight="900">Semana del 2 al 8 de Junio 2025</text>
+  <text x="888" y="37" font-family="system-ui,sans-serif" font-size="22" fill="#94a3b8">‹</text>
+  <text x="918" y="37" font-family="system-ui,sans-serif" font-size="22" fill="#94a3b8">›</text>
+  <!-- Column header row -->
+  <rect x="0" y="58" width="960" height="38" fill="#1e293b"/>
+  <text x="70" y="82" font-family="system-ui,sans-serif" font-size="11" fill="#64748b" font-weight="600" text-anchor="middle">Pabellón</text>
+  <text x="195" y="82" font-family="system-ui,sans-serif" font-size="12" fill="#f1f5f9" font-weight="700" text-anchor="middle">Lun 2</text>
+  <text x="320" y="82" font-family="system-ui,sans-serif" font-size="12" fill="#f1f5f9" font-weight="700" text-anchor="middle">Mar 3</text>
+  <text x="445" y="82" font-family="system-ui,sans-serif" font-size="12" fill="#93c5fd" font-weight="900" text-anchor="middle">● Mié 4</text>
+  <text x="570" y="82" font-family="system-ui,sans-serif" font-size="12" fill="#f1f5f9" font-weight="700" text-anchor="middle">Jue 5</text>
+  <text x="695" y="82" font-family="system-ui,sans-serif" font-size="12" fill="#f1f5f9" font-weight="700" text-anchor="middle">Vie 6</text>
+  <text x="808" y="82" font-family="system-ui,sans-serif" font-size="11" fill="#475569" text-anchor="middle">Sáb 7</text>
+  <text x="910" y="82" font-family="system-ui,sans-serif" font-size="11" fill="#475569" text-anchor="middle">Dom 8</text>
+  <!-- Vertical dividers -->
+  <line x1="130" y1="96" x2="130" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="255" y1="96" x2="255" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="380" y1="96" x2="380" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="505" y1="96" x2="505" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="630" y1="96" x2="630" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="755" y1="96" x2="755" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="860" y1="96" x2="860" y2="600" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Pabellon label cells -->
+  <rect x="0" y="96" width="130" height="168" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="65" y="174" font-family="system-ui,sans-serif" font-size="11" fill="#0f172a" font-weight="900" text-anchor="middle">Pabellón 1</text>
+  <rect x="0" y="264" width="130" height="168" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="65" y="342" font-family="system-ui,sans-serif" font-size="11" fill="#0f172a" font-weight="900" text-anchor="middle">Pabellón 2</text>
+  <rect x="0" y="432" width="130" height="168" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="65" y="510" font-family="system-ui,sans-serif" font-size="11" fill="#0f172a" font-weight="900" text-anchor="middle">Pabellón 3</text>
+  <line x1="130" y1="264" x2="960" y2="264" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="130" y1="432" x2="960" y2="432" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Today column highlight -->
+  <rect x="380" y="96" width="125" height="504" fill="#eff6ff" opacity="0.4"/>
+  <!-- Pabellón 1 blocks -->
+  <rect x="135" y="110" width="115" height="95" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="192" y="135" font-family="system-ui,sans-serif" font-size="10" fill="#1e40af" font-weight="700" text-anchor="middle">Dr. Rodríguez</text>
+  <text x="192" y="150" font-family="system-ui,sans-serif" font-size="9" fill="#3b82f6" text-anchor="middle">Apendicectomía</text>
+  <text x="192" y="164" font-family="system-ui,sans-serif" font-size="9" fill="#64748b" text-anchor="middle">08:00 – 10:30</text>
+  <rect x="135" y="215" width="115" height="50" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+  <text x="192" y="235" font-family="system-ui,sans-serif" font-size="10" fill="#166534" font-weight="700" text-anchor="middle">Dr. Martínez</text>
+  <text x="192" y="250" font-family="system-ui,sans-serif" font-size="9" fill="#16a34a" text-anchor="middle">12:00 – 13:30</text>
+  <rect x="260" y="110" width="115" height="65" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+  <text x="317" y="135" font-family="system-ui,sans-serif" font-size="10" fill="#9d174d" font-weight="700" text-anchor="middle">Dr. González</text>
+  <text x="317" y="150" font-family="system-ui,sans-serif" font-size="9" fill="#db2777" text-anchor="middle">09:00 – 10:30</text>
+  <!-- Today block - active blue -->
+  <rect x="385" y="110" width="115" height="105" rx="8" fill="#2563eb" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="442" y="135" font-family="system-ui,sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">Dr. Pérez</text>
+  <text x="442" y="150" font-family="system-ui,sans-serif" font-size="9" fill="#93c5fd" text-anchor="middle">Colecistectomía</text>
+  <text x="442" y="165" font-family="system-ui,sans-serif" font-size="9" fill="#bfdbfe" text-anchor="middle">07:30 – 11:00</text>
+  <rect x="393" y="176" width="66" height="18" rx="4" fill="#1d4ed8"/>
+  <text x="426" y="188" font-family="system-ui,sans-serif" font-size="9" fill="#93c5fd" font-weight="700" text-anchor="middle">En proceso</text>
+  <rect x="510" y="130" width="115" height="80" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="567" y="155" font-family="system-ui,sans-serif" font-size="10" fill="#1e40af" font-weight="700" text-anchor="middle">Dr. Fuentes</text>
+  <text x="567" y="170" font-family="system-ui,sans-serif" font-size="9" fill="#3b82f6" text-anchor="middle">10:00 – 13:00</text>
+  <rect x="635" y="110" width="115" height="60" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+  <text x="692" y="135" font-family="system-ui,sans-serif" font-size="10" fill="#166534" font-weight="700" text-anchor="middle">Dr. Castro</text>
+  <text x="692" y="150" font-family="system-ui,sans-serif" font-size="9" fill="#16a34a" text-anchor="middle">08:30 – 10:00</text>
+  <!-- Pabellón 2 blocks -->
+  <rect x="135" y="278" width="115" height="85" rx="8" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="192" y="302" font-family="system-ui,sans-serif" font-size="10" fill="#92400e" font-weight="700" text-anchor="middle">Dr. López</text>
+  <text x="192" y="317" font-family="system-ui,sans-serif" font-size="9" fill="#d97706" text-anchor="middle">Hernia inguinal</text>
+  <text x="192" y="332" font-family="system-ui,sans-serif" font-size="9" fill="#64748b" text-anchor="middle">07:00 – 09:30</text>
+  <rect x="385" y="278" width="115" height="65" rx="8" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5"/>
+  <text x="442" y="303" font-family="system-ui,sans-serif" font-size="10" fill="#4c1d95" font-weight="700" text-anchor="middle">Dr. Díaz</text>
+  <text x="442" y="318" font-family="system-ui,sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle">08:00 – 10:00</text>
+  <rect x="510" y="278" width="115" height="80" rx="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="567" y="303" font-family="system-ui,sans-serif" font-size="10" fill="#1e40af" font-weight="700" text-anchor="middle">Dr. Soto</text>
+  <text x="567" y="318" font-family="system-ui,sans-serif" font-size="9" fill="#3b82f6" text-anchor="middle">09:30 – 12:30</text>
+  <!-- Pabellón 3 blocks -->
+  <rect x="260" y="446" width="115" height="68" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+  <text x="317" y="471" font-family="system-ui,sans-serif" font-size="10" fill="#166534" font-weight="700" text-anchor="middle">Dr. Vargas</text>
+  <text x="317" y="486" font-family="system-ui,sans-serif" font-size="9" fill="#16a34a" text-anchor="middle">08:00 – 09:45</text>
+  <rect x="510" y="446" width="115" height="60" rx="8" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+  <text x="567" y="471" font-family="system-ui,sans-serif" font-size="10" fill="#9d174d" font-weight="700" text-anchor="middle">Dr. Morales</text>
+  <text x="567" y="486" font-family="system-ui,sans-serif" font-size="9" fill="#db2777" text-anchor="middle">10:00 – 11:30</text>
+  <rect x="635" y="446" width="115" height="75" rx="8" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="692" y="471" font-family="system-ui,sans-serif" font-size="10" fill="#92400e" font-weight="700" text-anchor="middle">Dr. Silva</text>
+  <text x="692" y="486" font-family="system-ui,sans-serif" font-size="9" fill="#d97706" text-anchor="middle">07:30 – 10:00</text>
+</svg>

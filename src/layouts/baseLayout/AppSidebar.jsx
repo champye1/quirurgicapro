@@ -128,7 +128,7 @@ export default function AppSidebar({
           <div className="flex items-center gap-3">
             <Logo />
             <div>
-              <h2 className={`text-lg font-black tracking-tighter uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>SurgicalHUB</h2>
+              <h2 className={`text-lg font-black tracking-tighter uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>QuirúrgicaPro</h2>
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{portalLabel}</span>
             </div>
           </div>
