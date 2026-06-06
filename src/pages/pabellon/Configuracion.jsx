@@ -327,8 +327,8 @@ export default function Configuracion() {
   const labelClass = `block text-[10px] font-black uppercase tracking-widest mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl mx-auto space-y-6">
-      <div className="mb-8">
+    <div id="tour-cfg-container" className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl mx-auto space-y-6">
+      <div id="tour-cfg-header" className="mb-8">
         <h2 className={`text-2xl lg:text-3xl font-black tracking-tighter uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>
           Configuración
         </h2>
@@ -338,7 +338,7 @@ export default function Configuracion() {
       </div>
 
       {/* ── Información de la Clínica ── */}
-      <Card hover={false} className="p-6 space-y-5">
+      <Card id="tour-cfg-clinica" hover={false} className="p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
             <Building2 size={20} className="text-blue-600" />
@@ -454,7 +454,7 @@ export default function Configuracion() {
       </Card>
 
       {/* ── WhatsApp Business ── */}
-      <Card hover={false} className="p-6 space-y-6">
+      <Card id="tour-cfg-whatsapp" hover={false} className="p-6 space-y-6">
         {/* Header de sección */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
@@ -676,7 +676,8 @@ export default function Configuracion() {
       </Card>
 
       {/* ── Facturación Electrónica ── */}
-      <Card hover={false} className="p-6 space-y-5">
+
+      <Card id="tour-cfg-facturacion" hover={false} className="p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-emerald-900/40' : 'bg-emerald-50'}`}>
             <Receipt size={20} className={isDark ? 'text-emerald-400' : 'text-emerald-600'} />

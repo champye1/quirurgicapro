@@ -77,7 +77,7 @@ export default function Chat() {
   const selectedKey = selectedRequest ?? '__general__'
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div id="tour-chat-container" className="flex flex-col space-y-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
           <MessageSquare className="w-5 h-5 text-blue-600" />
@@ -90,7 +90,7 @@ export default function Chat() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4" style={{ height: 'calc(100vh - 12rem)' }}>
         {/* Sidebar: threads */}
-        <div className={`lg:col-span-1 rounded-2xl border overflow-y-auto ${cardBg}`}>
+        <div id="tour-chat-threads" className={`lg:col-span-1 rounded-2xl border overflow-y-auto ${cardBg}`}>
           <div className={`px-4 py-3 border-b ${dark ? 'border-slate-700' : 'border-slate-200'}`}>
             <p className={`text-xs font-black uppercase tracking-wider ${textSec}`}>
               <Users className="inline w-3 h-3 mr-1" />Conversaciones

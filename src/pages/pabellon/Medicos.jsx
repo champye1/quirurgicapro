@@ -545,12 +545,12 @@ export default function Medicos() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div id="tour-med-container" className="space-y-6">
+      <div id="tour-med-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
           Gestión de Médicos
         </h1>
-        <div className="flex flex-wrap gap-2">
+        <div id="tour-med-actions" className="flex flex-wrap gap-2">
           {medicosFiltrados.length > 0 && (
             <>
               <button
@@ -589,6 +589,7 @@ export default function Medicos() {
         </div>
       </div>
 
+      <div id="tour-med-filters">
       <MedicosFiltros
         busqueda={busqueda}
         setBusqueda={handleBusqueda}
@@ -600,6 +601,7 @@ export default function Medicos() {
         medicos={medicos}
         especialidades={ESPECIALIDADES}
       />
+      </div>
 
       {mostrarFormulario && (
         <MedicoForm

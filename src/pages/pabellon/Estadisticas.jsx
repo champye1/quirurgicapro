@@ -146,8 +146,8 @@ export default function Estadisticas() {
   const tooltipBorder = dark ? '#475569' : '#e2e8f0'
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div id="tour-est-container" className="space-y-6">
+      <div id="tour-est-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className={`text-2xl sm:text-3xl font-bold ${textPrimary}`}>Estadísticas y Reportes</h1>
         <div className="flex flex-wrap gap-2 items-center">
           <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export default function Estadisticas() {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div id="tour-est-kpis" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className={`${cardClass} flex items-center gap-3`}>
               <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
                 <Activity className="w-5 h-5 text-blue-600" />

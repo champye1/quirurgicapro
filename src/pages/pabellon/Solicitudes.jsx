@@ -691,9 +691,9 @@ export default function Solicitudes() {
   const todasSeleccionadas = pendientesVisibles.length > 0 && pendientesVisibles.every(s => seleccionados.has(s.id))
 
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500 max-w-5xl mx-auto px-4 sm:px-6 lg:px-0">
+    <div id="tour-sol-container" className="animate-in fade-in slide-in-from-right duration-500 max-w-5xl mx-auto px-4 sm:px-6 lg:px-0">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 lg:mb-10 text-center relative">
+      <div id="tour-sol-header" className="mb-6 sm:mb-8 lg:mb-10 text-center relative">
         <h2 className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter uppercase mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
           BANDEJA DE SOLICITUDES
         </h2>
@@ -711,6 +711,7 @@ export default function Solicitudes() {
         )}
       </div>
 
+      <div id="tour-sol-filters">
       <FiltrosSolicitudes
         busqueda={busqueda} setBusqueda={setBusqueda}
         filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado}
@@ -724,6 +725,7 @@ export default function Solicitudes() {
         solicitudes={solicitudes}
         solicitudesFiltradas={solicitudesFiltradas}
       />
+      </div>
 
       {/* Barra de acciones masivas */}
       {pendientesVisibles.length > 0 && (

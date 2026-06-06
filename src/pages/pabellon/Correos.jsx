@@ -329,9 +329,9 @@ export default function Correos() {
 
   // ──────────────── RENDER ────────────────
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500 max-w-5xl mx-auto px-4 sm:px-6 lg:px-0">
+    <div id="tour-cor-container" className="animate-in fade-in slide-in-from-right duration-500 max-w-5xl mx-auto px-4 sm:px-6 lg:px-0">
       {/* Header */}
-      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div id="tour-cor-header" className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h2 className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter uppercase mb-1 ${
             isDark ? 'text-white' : 'text-slate-900'

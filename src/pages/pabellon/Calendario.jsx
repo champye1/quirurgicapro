@@ -787,7 +787,7 @@ export default function Calendario() {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 md:space-y-5 px-4 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-4 md:py-5 lg:py-6 max-w-7xl mx-auto">
+    <div id="tour-cal-container" className="space-y-3 sm:space-y-4 md:space-y-5 px-4 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-4 md:py-5 lg:py-6 max-w-7xl mx-auto">
       {/* Aviso de reagendamiento */}
       {(fromReagendamientoNotification || (isReagendarMode && cirugiaAReagendar)) && (
         <div className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${
@@ -811,7 +811,7 @@ export default function Calendario() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between mb-3 sm:mb-4 md:mb-5">
+      <div id="tour-cal-header" className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between mb-3 sm:mb-4 md:mb-5">
         <div>
           <Breadcrumbs
             anio={anio}

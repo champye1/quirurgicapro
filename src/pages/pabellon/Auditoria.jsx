@@ -188,8 +188,8 @@ export default function Auditoria() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div id="tour-aud-container" className="space-y-6">
+      <div id="tour-aud-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Historial de Auditoría</h1>
         {logsFiltrados.length > 0 && (
           <div className="flex gap-2">
@@ -214,7 +214,7 @@ export default function Auditoria() {
       </div>
 
       {/* Filtros */}
-      <div className="card">
+      <div id="tour-aud-filters" className="card">
         <div className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />

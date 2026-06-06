@@ -419,12 +419,12 @@ export default function BloqueoHorario() {
   }
 
   return (
-    <div className="space-y-6">
+    <div id="tour-blq-container" className="space-y-6">
       <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Bloqueo de Horario</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div id="tour-blq-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulario */}
-        <div className="card">
+        <div id="tour-blq-form" className="card">
           <div className="flex justify-between items-center mb-4">
             <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               {bloqueoEditando ? 'Editar Bloqueo' : 'Crear Bloqueo'}
@@ -628,7 +628,7 @@ export default function BloqueoHorario() {
         </div>
 
         {/* Lista de bloqueos */}
-        <div className="card">
+        <div id="tour-blq-list" className="card">
           <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Bloqueos Activos</h2>
           <div className="space-y-3">
             {bloqueos.length === 0 ? (
