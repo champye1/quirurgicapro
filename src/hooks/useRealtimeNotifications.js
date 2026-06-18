@@ -15,6 +15,10 @@ export function useRealtimeNotifications(userId, doctorId = null) {
   useEffect(() => {
     if (!userId) return
 
+    const onRealtimeError = (status, err) => {
+      if (err) logger.warn('Realtime:', status, err.message)
+    }
+
     // Canal para notificaciones
     const notificationsChannel = supabase
       .channel(`notifications:${userId}`)
@@ -32,7 +36,7 @@ export function useRealtimeNotifications(userId, doctorId = null) {
           showInfo(`Nueva notificación: ${payload.new?.titulo ?? 'Sin título'}`)
         }
       )
-      .subscribe()
+      .subscribe(onRealtimeError)
 
     // Canal para cambios en solicitudes — filtrado por doctor cuando es posible
     const requestsChannel = supabase
@@ -50,11 +54,9 @@ export function useRealtimeNotifications(userId, doctorId = null) {
           queryClient.invalidateQueries({ queryKey: ['solicitudes'] })
           queryClient.invalidateQueries({ queryKey: ['solicitudes-doctor'] })
           queryClient.invalidateQueries({ queryKey: ['solicitudes-pendientes'] })
-          // Los toasts de aceptada/rechazada los maneja el canal 'notifications'
-          // (que filtra por user_id) para evitar notificar a todos los doctores.
         }
       )
-      .subscribe()
+      .subscribe(onRealtimeError)
 
     // Canal para cambios en cirugías
     const surgeriesChannel = supabase
@@ -74,14 +76,13 @@ export function useRealtimeNotifications(userId, doctorId = null) {
           queryClient.invalidateQueries({ queryKey: ['calendario-doctor-cirugias'] })
           queryClient.invalidateQueries({ queryKey: ['cirugias-dia-detalle'] })
           queryClient.invalidateQueries({ queryKey: ['cirugias-fecha'] })
-          
-          // Notificar cancelaciones
+
           if (payload.eventType === 'UPDATE' && payload.new?.estado === 'cancelada' && payload.old?.estado === 'programada') {
             showInfo('Una cirugía ha sido cancelada')
           }
         }
       )
-      .subscribe()
+      .subscribe(onRealtimeError)
 
     // Cleanup
     return () => {

@@ -14,4 +14,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
   },
+  realtime: {
+    // Backoff exponencial: 2s, 4s, 8s... máx 30s — evita spam de reintentos
+    reconnectAfterMs: (tries) => Math.min(Math.pow(2, tries) * 2000, 30000),
+    // Máximo 5 reintentos antes de rendirse
+    timeout: 10000,
+  },
 })
