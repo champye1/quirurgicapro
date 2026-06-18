@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
-import { MessageSquare, Save, CheckCircle2, AlertTriangle, Phone, Wifi, WifiOff, Building2, Bell, Play, Download, Database, FileSignature, BookOpen, Receipt, Eye, EyeOff, DoorOpen, Plus, Pencil, Check, X, ToggleLeft, ToggleRight } from 'lucide-react'
+import { MessageSquare, Save, CheckCircle2, AlertTriangle, Building2, Bell, Play, Download, Database, FileSignature, BookOpen, Receipt, DoorOpen, Plus, Pencil, Check, X, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNotifications } from '../../hooks/useNotifications'
 import { sanitizeString } from '../../utils/sanitizeInput'
@@ -27,7 +27,7 @@ export default function Configuracion() {
     activo: false,
   })
   const [cargadoInicial, setCargadoInicial] = useState(false)
-  const [testResult, setTestResult] = useState(null) // null | 'ok' | 'error'
+  const [_testResult, setTestResult] = useState(null)
 
   // Información de la clínica
   const { data: clinicInfo } = useClinicInfo()
@@ -52,9 +52,9 @@ export default function Configuracion() {
     api_key: '', rut_emisor: '', razon_social: '', giro: '', direccion: '', comuna: '', sandbox: true,
   })
   const [factCargado, setFactCargado]     = useState(false)
-  const [factGuardando, setFactGuardando] = useState(false)
-  const [factResult, setFactResult]       = useState(null)
-  const [showApiKey, setShowApiKey]       = useState(false)
+  const [_factGuardando, setFactGuardando] = useState(false)
+  const [_factResult, setFactResult]       = useState(null)
+  const [_showApiKey, _setShowApiKey]       = useState(false)
 
   useEffect(() => {
     if (factCargado) return
@@ -65,7 +65,7 @@ export default function Configuracion() {
       })
   }, [factCargado])
 
-  const handleSaveFacturacion = async () => {
+  const _handleSaveFacturacion = async () => {
     if (!factForm.api_key || !factForm.rut_emisor || !factForm.razon_social) {
       showError('Completa API Key, RUT y Razón Social.')
       return
@@ -238,7 +238,7 @@ export default function Configuracion() {
     )
   }
 
-  const { isLoading } = useQuery({
+  const { isLoading: _isLoading } = useQuery({
     queryKey: ['clinic-settings-whatsapp'],
     queryFn: async () => {
       const { data } = await supabase
@@ -261,7 +261,7 @@ export default function Configuracion() {
     },
   })
 
-  const guardar = useMutation({
+  const _guardar = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       const { error } = await supabase
@@ -286,7 +286,7 @@ export default function Configuracion() {
     onError: (e) => showError('Error al guardar: ' + (e.message || e)),
   })
 
-  const probarConexion = useMutation({
+  const _probarConexion = useMutation({
     mutationFn: async () => {
       if (!form.instancia || !form.token) {
         throw new Error('Complete el ID de instancia y el token para probar la conexión')

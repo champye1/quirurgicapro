@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
 import { useTheme } from '../../contexts/ThemeContext'
 import ChatView from '../../components/common/ChatView'
@@ -10,8 +10,6 @@ import { es } from 'date-fns/locale'
 export default function Chat() {
   const { theme } = useTheme()
   const dark = theme === 'dark'
-  const queryClient = useQueryClient()
-
   // Conversaciones: mensajes agrupados por (doctor_id via surgery_request_id OR global)
   const [selectedRequest, setSelectedRequest] = useState(null) // null = canal general
 

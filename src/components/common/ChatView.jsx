@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../config/supabase'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -11,7 +11,6 @@ export default function ChatView({ senderRole, surgeryRequestId = null }) {
   const { theme } = useTheme()
   const dark = theme === 'dark'
   const { showError } = useNotifications()
-  const queryClient = useQueryClient()
   const [texto, setTexto] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef(null)
