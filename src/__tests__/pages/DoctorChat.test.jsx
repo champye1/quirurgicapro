@@ -103,9 +103,10 @@ describe('DoctorChat', () => {
     await waitFor(() => expect(screen.getByText(/Sin conversaciones de solicitudes/i)).toBeInTheDocument())
   })
 
-  it('registra la suscripción realtime al montar', async () => {
+  it('no abre canal realtime (usa polling via refetchInterval)', async () => {
     renderChat()
-    await waitFor(() => expect(supabase.channel).toHaveBeenCalledWith('doctor-chat-threads'))
+    await waitFor(() => expect(screen.getByText('Chat con Pabellón')).toBeInTheDocument())
+    expect(supabase.channel).not.toHaveBeenCalled()
   })
 
   it('muestra threads de solicitudes cuando existen mensajes', async () => {
