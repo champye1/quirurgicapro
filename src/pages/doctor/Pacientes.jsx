@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../config/supabase'
-import { Users, Search, ChevronDown, ChevronUp, Calendar, FileText, Clock, Pencil, Check, X } from 'lucide-react'
+import { Users, Search, ChevronDown, ChevronUp, Calendar, FileText, Clock, Pencil, Check, X, ClipboardList } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -29,6 +30,7 @@ const CIRUGIA_COLORS = {
 export default function Pacientes() {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
+  const navigate = useNavigate()
   const { showSuccess, showError } = useNotifications()
   const queryClient = useQueryClient()
   const [busqueda, setBusqueda] = useState('')
@@ -204,6 +206,16 @@ export default function Pacientes() {
 
                 {isOpen && (
                   <div className={`px-5 pb-5 space-y-4 border-t ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>
+
+                    {/* Botón Ficha Clínica */}
+                    <div className="pt-4">
+                      <button
+                        onClick={e => { e.stopPropagation(); navigate(`/doctor/ficha/${p.id}`) }}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-colors"
+                      >
+                        <ClipboardList size={13} /> Ver Ficha Clínica Dental
+                      </button>
+                    </div>
 
                     {/* Previsión editable */}
                     <div className="pt-4">

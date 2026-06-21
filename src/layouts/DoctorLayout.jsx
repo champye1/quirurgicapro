@@ -15,6 +15,7 @@ const HorariosDisponibles = lazy(() => import('../pages/doctor/HorariosDisponibl
 const Disponibilidad      = lazy(() => import('../pages/doctor/Disponibilidad'))
 const Chat                = lazy(() => import('../pages/doctor/Chat'))
 const Perfil              = lazy(() => import('../pages/Perfil'))
+const FichaClinica        = lazy(() => import('../pages/fichaClinica/FichaClinica'))
 
 const MENU = [
   { path: '/doctor',            icon: LayoutDashboard, label: 'Panel Principal' },
@@ -77,7 +78,8 @@ export default function DoctorLayout() {
         <Route path="/disponibilidad"  element={<Disponibilidad />} />
         <Route path="/chat"            element={<Chat />} />
         <Route path="/calendario"      element={<Calendario />} />
-        <Route path="/perfil"      element={<Perfil />} />
+        <Route path="/perfil"          element={<Perfil />} />
+        <Route path="/ficha/:patientId" element={<FichaClinica />} />
         <Route path="*"            element={<Navigate to="/doctor" />} />
       </Routes>
     </BaseLayout>

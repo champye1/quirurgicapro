@@ -22,6 +22,7 @@ const Correos         = lazy(() => import('../pages/pabellon/Correos'))
 const Configuracion   = lazy(() => import('../pages/pabellon/Configuracion'))
 const Perfil          = lazy(() => import('../pages/Perfil'))
 const Ayuda           = lazy(() => import('../pages/pabellon/Ayuda'))
+const FichaClinica    = lazy(() => import('../pages/fichaClinica/FichaClinica'))
 
 const MENU = [
   { path: '/pabellon',           icon: Home,       label: 'Inicio' },
@@ -110,6 +111,7 @@ export default function PabellonLayout() {
         <Route path="/configuracion"  element={<Configuracion />} />
         <Route path="/ayuda"          element={<Ayuda />} />
         <Route path="/perfil"         element={<Perfil />} />
+        <Route path="/ficha/:patientId" element={<FichaClinica />} />
         <Route path="*"            element={<Navigate to="/pabellon" />} />
       </Routes>
     </BaseLayout>
